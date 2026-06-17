@@ -1,0 +1,11 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    # Quarantined dead lineage (the abandoned compositor-as-plugin API). Kept for
+    # historical reference only; it references removed symbols and must not be
+    # analyzed as part of the live package. See README "Two architectures".
+    - legacy/**
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
