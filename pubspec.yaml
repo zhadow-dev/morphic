@@ -1,6 +1,6 @@
 name: morphic
 description: "Spatial Desktop Composition Framework — a platform layer where spatial composition graphs are rendered across synchronized surfaces."
-version: 0.2.0-dev.1
+version: 0.2.0-dev.2
 homepage: https://github.com/zhadow-dev/morphic
 repository: https://github.com/zhadow-dev/morphic
 issue_tracker: https://github.com/zhadow-dev/morphic/issues
