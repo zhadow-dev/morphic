@@ -56,7 +56,7 @@ class _InspectorContent extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text('INSPECTOR',
                     style: TextStyle(
-                        color: const Color(0xFFd2a8ff).withOpacity(0.9),
+                        color: const Color(0xFFd2a8ff).withValues(alpha: 0.9),
                         fontSize: 8,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.2)),
@@ -151,7 +151,7 @@ class _InspectorContent extends StatelessWidget {
             value ? Icons.check_box : Icons.check_box_outline_blank,
             size: 12,
             color: value
-                ? const Color(0xFFd2a8ff).withOpacity(0.7)
+                ? const Color(0xFFd2a8ff).withValues(alpha: 0.7)
                 : const Color(0xFF30363d),
           ),
           const SizedBox(width: 6),

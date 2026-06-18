@@ -94,7 +94,7 @@ class _EchoesState extends State<_Echoes> with SingleTickerProviderStateMixin {
                         child: Text(
                           _fragments[i],
                           style: TextStyle(
-                            color: const Color(0xFFC9D4E0).withOpacity(opacity),
+                            color: const Color(0xFFC9D4E0).withValues(alpha: opacity),
                             fontSize: i.isEven ? 14.0 : 12.5,
                             fontWeight: FontWeight.w300,
                             height: 1.3,

@@ -272,7 +272,7 @@ class _EditorPaneState extends State<EditorPane> {
                     margin: const EdgeInsets.only(right: 12),
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFda3633).withOpacity(0.15),
+                      color: const Color(0xFFda3633).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(_saveError!, style: const TextStyle(color: Color(0xFFff7b72), fontSize: 9, fontWeight: FontWeight.w600)),

@@ -36,7 +36,6 @@ class _OverlayContent extends StatefulWidget {
 }
 
 class _OverlayContentState extends State<_OverlayContent> {
-  static const _channel = MethodChannel('morphic');
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
 
@@ -138,7 +137,7 @@ class _OverlayContentState extends State<_OverlayContent> {
                       decoration: InputDecoration(
                         hintText: 'Type a command...',
                         hintStyle: TextStyle(
-                            color: const Color(0xFF6e7681).withOpacity(0.6),
+                            color: const Color(0xFF6e7681).withValues(alpha: 0.6),
                             fontSize: 12),
                         border: InputBorder.none,
                         isDense: true,
@@ -215,7 +214,7 @@ class _OverlayContentState extends State<_OverlayContent> {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: highlighted
-              ? const Color(0xFFf7d731).withOpacity(0.08)
+              ? const Color(0xFFf7d731).withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(4),
         ),

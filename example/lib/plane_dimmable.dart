@@ -135,7 +135,7 @@ class _PlaneDimmableState extends State<PlaneDimmable> {
                       // M2.6 — graded by the surface's vitality: the anchor radiates full light,
                       // companions catch proportionally less (a dominant surface radiates vitality).
                       const Color(0xFFFFFFFF)
-                          .withOpacity(kActiveLiftOpacity * widget.vitality),
+                          .withValues(alpha: kActiveLiftOpacity * widget.vitality),
                       const Color(0x00FFFFFF),
                     ],
                   ),

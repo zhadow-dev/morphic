@@ -1,3 +1,12 @@
+## 0.2.0-dev.3
+
+* CLI authentication: `dart run morphic:login`, `morphic:logout`, `morphic:whoami`.
+* `dart run morphic:init --spatial` securely delivers the spatial runtime — sign
+  in, authorize, download over a short-lived signed URL, verify the SHA-256
+  checksum, then install. No license keys to copy or paste.
+* Browser-based login via a localhost loopback; credentials are stored
+  per-platform and access tokens refresh automatically.
+
 ## 0.2.0-dev.2
 
 * Moved to a clean public repository with sanitized public history

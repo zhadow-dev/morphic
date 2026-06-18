@@ -102,7 +102,7 @@ class _WorkspaceContentState extends State<_WorkspaceContent> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               color: _glass
-                  ? const Color(0xFF161b22).withOpacity(0.30)
+                  ? const Color(0xFF161b22).withValues(alpha: 0.30)
                   : const Color(0xFF161b22),
               border: const Border(
                   bottom: BorderSide(color: Color(0x4430363d))),
@@ -119,7 +119,7 @@ class _WorkspaceContentState extends State<_WorkspaceContent> {
                 const SizedBox(width: 8),
                 Text('WORKSPACE',
                     style: TextStyle(
-                        color: const Color(0xFF58a6ff).withOpacity(0.9),
+                        color: const Color(0xFF58a6ff).withValues(alpha: 0.9),
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.5)),
@@ -143,7 +143,7 @@ class _WorkspaceContentState extends State<_WorkspaceContent> {
                 'WORKSPACE  E#$_engineId\nplain · acrylic test',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: const Color(0xFFe6edf3).withOpacity(0.45),
+                    color: const Color(0xFFe6edf3).withValues(alpha: 0.45),
                     fontSize: 12,
                     fontFamily: 'Consolas',
                     height: 1.6),
@@ -163,7 +163,7 @@ class _WorkspaceContentState extends State<_WorkspaceContent> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(3),
         ),
         child: Text(label,

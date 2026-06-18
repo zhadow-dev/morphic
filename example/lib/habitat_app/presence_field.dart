@@ -181,8 +181,8 @@ class _CorePainter extends CustomPainter {
     final paint = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFF7E97D8).withOpacity(glow),
-          const Color(0xFF4E5F8C).withOpacity(glow * 0.45),
+          const Color(0xFF7E97D8).withValues(alpha: glow),
+          const Color(0xFF4E5F8C).withValues(alpha: glow * 0.45),
           const Color(0x00000000),
         ],
         stops: const [0.0, 0.45, 1.0],

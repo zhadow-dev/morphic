@@ -51,8 +51,6 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
   int _engineId = -1;
 
   // Phase 2B: Lifecycle state tracking
-  AppLifecycleState? _lastLifecycleState;
-  String _lifecycleLog = '';
 
   // Phase 2B.1: Recovery instrumentation
   int? _resumeTimestampUs;      // microsecond timestamp of last resume
@@ -95,8 +93,6 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
   // Phase 2B: Track lifecycle state changes from native orchestration
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final prevState = _lastLifecycleState;
-    _lastLifecycleState = state;
     final msg = 'Lifecycle: ${state.name}';
     debugPrint('[ENGINE $_engineId] $msg');
 
@@ -116,7 +112,6 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
 
     if (mounted) {
       setState(() {
-        _lifecycleLog = msg;
       });
     }
     // Report lifecycle change to native for telemetry
@@ -362,21 +357,21 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
                 borderRadius: BorderRadius.circular(8),
                 gradient: LinearGradient(
                   colors: [
-                    itemColor.withOpacity(0.7),
-                    itemColor.withOpacity(0.3),
+                    itemColor.withValues(alpha: 0.7),
+                    itemColor.withValues(alpha: 0.3),
                   ],
                 ),
                 boxShadow: _stressMode
                     ? [
                         BoxShadow(
-                          color: itemColor.withOpacity(0.3 * opacity),
+                          color: itemColor.withValues(alpha: 0.3 * opacity),
                           blurRadius: 8 + 4 * sin(phase),
                           offset: Offset(0, 2 + sin(phase) * 2),
                         ),
                       ]
                     : null,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.1 + 0.1 * sin(phase)),
+                  color: Colors.white.withValues(alpha: 0.1 + 0.1 * sin(phase)),
                 ),
               ),
               child: Row(
@@ -387,7 +382,7 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
                     child: Icon(
                       _getIcon(index),
                       size: 18,
-                      color: Colors.white.withOpacity(0.7 + 0.3 * sin(phase)),
+                      color: Colors.white.withValues(alpha: 0.7 + 0.3 * sin(phase)),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -401,7 +396,7 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                         if (_stressMode)
@@ -412,8 +407,8 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
                             style: TextStyle(
                               fontSize: 8,
                               color: _animationsPaused
-                                  ? const Color(0xFFE94560).withOpacity(0.7)
-                                  : Colors.white.withOpacity(0.4),
+                                  ? const Color(0xFFE94560).withValues(alpha: 0.7)
+                                  : Colors.white.withValues(alpha: 0.4),
                             ),
                           ),
                       ],
@@ -464,13 +459,13 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
                     borderRadius: BorderRadius.circular(12),
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFFE94560).withOpacity(opacity),
-                        const Color(0xFF533483).withOpacity(opacity * 0.3),
+                        const Color(0xFFE94560).withValues(alpha: opacity),
+                        const Color(0xFF533483).withValues(alpha: opacity * 0.3),
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFE94560).withOpacity(opacity * 0.5),
+                        color: const Color(0xFFE94560).withValues(alpha: opacity * 0.5),
                         blurRadius: 16,
                         spreadRadius: 2,
                       ),
@@ -495,15 +490,15 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF0a0e1a).withOpacity(0.95),
-                const Color(0xFF0a0e1a).withOpacity(0.7),
+                const Color(0xFF0a0e1a).withValues(alpha: 0.95),
+                const Color(0xFF0a0e1a).withValues(alpha: 0.7),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFE94560).withOpacity(0.1 * v),
+                color: const Color(0xFFE94560).withValues(alpha: 0.1 * v),
                 blurRadius: 12,
                 offset: const Offset(0, 2),
               ),
@@ -518,7 +513,7 @@ class _MorphicSurfaceContentState extends State<MorphicSurfaceContent>
               Text('MORPHIC',
                 style: TextStyle(
                   fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 4,
-                  color: Colors.white.withOpacity(0.8 + 0.2 * v),
+                  color: Colors.white.withValues(alpha: 0.8 + 0.2 * v),
                 )),
               const Spacer(),
               Text(

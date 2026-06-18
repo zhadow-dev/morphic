@@ -94,16 +94,16 @@ class MaterialLayer extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(color: r.tint.withOpacity(r.tintOpacity)),
+          ColoredBox(color: r.tint.withValues(alpha: r.tintOpacity)),
           if (r.frostOpacity > 0)
-            ColoredBox(color: r.frost.withOpacity(r.frostOpacity)),
+            ColoredBox(color: r.frost.withValues(alpha: r.frostOpacity)),
           // Edge-light — a hairline highlight along the top edge (light from above).
           if (r.edgeHighlight > 0)
             Align(
               alignment: Alignment.topCenter,
               child: Container(
                 height: 1.0,
-                color: const Color(0xFFFFFFFF).withOpacity(r.edgeHighlight),
+                color: const Color(0xFFFFFFFF).withValues(alpha: r.edgeHighlight),
               ),
             ),
         ],

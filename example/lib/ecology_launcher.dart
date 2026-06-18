@@ -25,7 +25,6 @@ class _EcologyLauncherState extends State<EcologyLauncher> {
   final _ecology = EcologyController();
   List<Map<String, dynamic>> _surfaces = [];
   List<Map<String, dynamic>> _workspaces = [];
-  String _currentWorkspace = '';
   final List<String> _log = [];
   Timer? _refreshTimer;
 
@@ -74,9 +73,6 @@ class _EcologyLauncherState extends State<EcologyLauncher> {
           return Map<String, dynamic>.fromEntries(
               m.entries.map((e) => MapEntry(e.key.toString(), e.value)));
         }).toList();
-
-        _currentWorkspace =
-            (summary['currentWorkspace'] as String?) ?? '';
       });
     } catch (e) {
       // Ignore — summary may fail during startup.
@@ -439,7 +435,7 @@ class _EcologyLauncherState extends State<EcologyLauncher> {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         decoration: BoxDecoration(
           color: value
-              ? const Color(0xFF238636).withOpacity(0.15)
+              ? const Color(0xFF238636).withValues(alpha: 0.15)
               : const Color(0xFF161b22),
           borderRadius: BorderRadius.circular(4),
           border: Border.all(
@@ -475,9 +471,9 @@ class _EcologyLauncherState extends State<EcologyLauncher> {
         child: Container(
           height: 32,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Center(
             child: Text('+ $label',
@@ -555,7 +551,7 @@ class _EcologyLauncherState extends State<EcologyLauncher> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 4, vertical: 1),
                       decoration: BoxDecoration(
-                        color: kindColor.withOpacity(0.12),
+                        color: kindColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(kind.toUpperCase(),
@@ -585,7 +581,7 @@ class _EcologyLauncherState extends State<EcologyLauncher> {
               child: Container(
                 width: 22, height: 22,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFf85149).withOpacity(0.1),
+                  color: const Color(0xFFf85149).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Icon(Icons.close, size: 12,

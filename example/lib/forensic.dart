@@ -2,7 +2,7 @@ import 'dart:io';
 
 /// PHASE 1A forensic instrumentation (Dart side).
 ///
-/// Writes timestamped events to <exe dir>\morphic_forensic_dart.log. Each line
+/// Writes timestamped events to `<exe dir>`\morphic_forensic_dart.log. Each line
 /// carries a wall-clock stamp so it can be interleaved with the native trace
 /// (morphic_forensic.log) into a single startup timeline. Pure instrumentation.
 class Forensic {

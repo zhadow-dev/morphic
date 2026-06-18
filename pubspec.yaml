@@ -1,6 +1,6 @@
 name: morphic
-description: "Spatial Desktop Composition Framework — a platform layer where spatial composition graphs are rendered across synchronized surfaces."
-version: 0.2.0-dev.2
+description: "Multi-window framework for Flutter desktop: build real windows, inspectors, tool palettes, detached panels, workspaces and spatial surfaces from one Dart codebase."
+version: 0.2.0-dev.3
 homepage: https://github.com/zhadow-dev/morphic
 repository: https://github.com/zhadow-dev/morphic
 issue_tracker: https://github.com/zhadow-dev/morphic/issues
@@ -18,6 +18,8 @@ dependencies:
   args: ^2.5.0
   crypto: ^3.0.0
   path: ^1.9.0
+  # CLI auth + secure spatial delivery (`morphic:login` / `init --spatial`).
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -79,3 +81,11 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.dev/to/font-from-package
+
+topics:
+  - flutter
+  - desktop
+  - multi-window
+  - window-manager
+  - workspace
+  - spatial-ui

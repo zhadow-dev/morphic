@@ -87,7 +87,7 @@ class _ToolPaletteContentState extends State<_ToolPaletteContent> {
                 const SizedBox(width: 6),
                 Text('TOOLS',
                     style: TextStyle(
-                        color: const Color(0xFFf0883e).withOpacity(0.9),
+                        color: const Color(0xFFf0883e).withValues(alpha: 0.9),
                         fontSize: 8,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.2)),
@@ -152,12 +152,12 @@ class _ToolPaletteContentState extends State<_ToolPaletteContent> {
       child: Container(
         decoration: BoxDecoration(
           color: active
-              ? const Color(0xFFf0883e).withOpacity(0.15)
+              ? const Color(0xFFf0883e).withValues(alpha: 0.15)
               : const Color(0xFF0d1117),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: active
-                ? const Color(0xFFf0883e).withOpacity(0.4)
+                ? const Color(0xFFf0883e).withValues(alpha: 0.4)
                 : const Color(0xFF30363d),
           ),
         ),
