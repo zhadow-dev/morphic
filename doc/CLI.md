@@ -31,6 +31,7 @@ export MORPHIC_SITE_URL="https://www.getmorphic.space"   # hosts the browser log
 | --- | --- |
 | `dart run morphic:login` | Opens your browser, signs you in, stores a refresh token locally. Use `--email you@example.com` for a dev/mock backend (skips the browser). |
 | `dart run morphic:whoami` | Shows the signed-in account, plan and spatial access. |
+| `dart run morphic:license` | Shows your license: tier (Developer Preview), projects, spatial access and activation status. |
 | `dart run morphic:logout` | Revokes the session and clears local credentials. |
 | `dart run morphic:init --spatial` | Authenticated secure delivery of the spatial runtime: **authorize → short-TTL signed URL → download → SHA-256 verify → install**, then runs `init`. |
 

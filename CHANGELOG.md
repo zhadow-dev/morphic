@@ -1,3 +1,8 @@
+## 0.2.0-dev.8
+
+* New `dart run morphic:license` — shows your tier (Developer Preview),
+  projects, spatial access and activation status.
+
 ## 0.2.0-dev.7
 
 * Fix README onboarding bugs (from a cold-start audit): `morphic:init` needs
