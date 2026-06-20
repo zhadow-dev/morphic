@@ -1,3 +1,9 @@
+## 0.2.0-dev.5
+
+* The licensing CLI now defaults to the hosted Morphic backend at
+  `https://www.getmorphic.space` (overridable via `MORPHIC_API_URL`). The
+  native `dart run morphic:init` is unchanged and needs no backend.
+
 ## 0.2.0-dev.4
 
 * Fix: `morphic:login` opens the browser reliably on Windows — PowerShell
