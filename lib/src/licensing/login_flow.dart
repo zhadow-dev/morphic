@@ -101,7 +101,14 @@ class LoopbackLogin {
   void _openBrowser(String url) {
     try {
       if (Platform.isWindows) {
-        Process.run('cmd', ['/c', 'start', '', url]);
+        // PowerShell Start-Process with a single-quoted URL reliably preserves
+        // '&' in the query string. (cmd's `start` splits on unquoted '&', and
+        // explorer.exe opens a file window instead of the browser.)
+        Process.run('powershell', [
+          '-NoProfile',
+          '-Command',
+          "Start-Process '$url'",
+        ]);
       } else if (Platform.isMacOS) {
         Process.run('open', [url]);
       } else {

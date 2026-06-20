@@ -1,3 +1,12 @@
+## 0.2.0-dev.4
+
+* Fix: `morphic:login` opens the browser reliably on Windows — PowerShell
+  `Start-Process` preserves the `&` in the login URL (the old `cmd start`
+  truncated the query string at `&state=`, landing on the wrong page).
+* Docs: add the CLI / licensing guide (`doc/CLI.md`). The licensing commands
+  (`login` / `whoami` / `logout` / `init --spatial`) are experimental and read
+  `MORPHIC_API_URL`; the native `dart run morphic:init` is unaffected.
+
 ## 0.2.0-dev.3
 
 * CLI authentication: `dart run morphic:login`, `morphic:logout`, `morphic:whoami`.
