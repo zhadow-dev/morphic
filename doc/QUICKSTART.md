@@ -3,6 +3,13 @@
 A working Morphic app — a real, sovereign desktop window authored in Dart — in
 about 10 minutes. No spatial concepts, no Win32, no C++.
 
+## 0. Prerequisites
+
+- **Flutter** with Windows desktop enabled (`flutter config --enable-windows-desktop`).
+- **Visual Studio** (not VS Code) with the **“Desktop development with C++”**
+  workload — required to build any Flutter Windows app. Run `flutter doctor` and
+  make sure the Windows check is green before continuing.
+
 ## 1. Create a project and add Morphic
 
 ```bash

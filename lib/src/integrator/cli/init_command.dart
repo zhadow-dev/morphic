@@ -240,7 +240,7 @@ class InitCommand extends Command<int> {
         }
         env.out.writeln('\nDone. Next:');
         env.out.writeln(
-          '  1. point your app entry at Morphic:  void main() => runMorphicApp(MyApp());',
+          '  1. point your app entry at Morphic:  void main() => runMorphicApp(app: MyApp());',
         );
         env.out.writeln('  2. flutter pub get && flutter run -d windows');
         env.out.writeln(

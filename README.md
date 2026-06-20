@@ -10,26 +10,41 @@ activation, lifecycle). You author it all in Dart.
 > ⚠️ Pre-1.0, **Windows-only** today. The install flow and native runtime are
 > scratch-verified, but APIs may still evolve.
 
+## Prerequisites
+
+- **Flutter** (desktop enabled): `flutter config --enable-windows-desktop`
+- **Visual Studio** (not VS Code) with the **“Desktop development with C++”**
+  workload — Flutter needs it to build Windows apps. Verify with `flutter doctor`.
+
 ## Install
 
 ```bash
 flutter create my_app && cd my_app
 flutter pub add morphic
-dart run morphic:init        # patches windows/runner to host the runtime (reversible)
+dart run morphic:init --apply   # patches windows/runner to host the runtime (reversible)
+flutter pub get
 flutter run -d windows
 ```
 
-`morphic:init` hands process bootstrap to the Morphic runtime and materializes
-the runtime sources into `windows/runner/`. It leaves `lib/`, your pubspec, and
-every non-Windows platform untouched, and is fully reversible
-(`dart run morphic:remove`). **No C++, no CMake, no Win32.**
+> `morphic:init` is a **dry run** without `--apply` — it prints the plan but
+> changes nothing. Use `--apply` to actually install. It leaves `lib/`, your
+> pubspec, and every non-Windows platform untouched, and is fully reversible
+> (`dart run morphic:remove --apply`). **No C++, no CMake, no Win32.**
 
 ## Your first window
 
+A **surface** is a window. Its content is an ordinary Flutter app behind a
+top-level `@pragma('vm:entry-point')` function the runtime launches by name:
+
 ```dart
+// lib/main.dart
+import 'package:flutter/material.dart';
 import 'package:morphic/morphic.dart';
 
-void main() => runMorphicApp(app: MyApp());
+@pragma('vm:entry-point')
+void mainSurface() => runApp(
+      const MaterialApp(home: Scaffold(body: Center(child: Text('Hello, Morphic')))),
+    );
 
 class MyApp extends MorphicApp {
   @override
@@ -40,20 +55,28 @@ class MyApp extends MorphicApp {
         SurfaceSpec.workspace(id: 'main', entrypoint: 'mainSurface'),
       ];
 }
+
+void main() => runMorphicApp(app: MyApp());
 ```
 
 ## Multiple windows
 
-Declare more surfaces — each becomes its own real window:
+Add another spec **and its entrypoint** — each surface is its own engine:
 
 ```dart
-@override
+@pragma('vm:entry-point')
+void inspector() => runApp(
+      const MaterialApp(home: Scaffold(body: Center(child: Text('Inspector')))),
+    );
+
+// in surfaces():
 List<SurfaceSpec> surfaces() => const [
-      SurfaceSpec.workspace(id: 'editor', entrypoint: 'editor'),
-      SurfaceSpec.inspector(id: 'inspector', entrypoint: 'inspector'),
-      SurfaceSpec.palette(id: 'tools', entrypoint: 'tools'),
+      SurfaceSpec.workspace(id: 'main', entrypoint: 'mainSurface'),
+      SurfaceSpec.inspector(id: 'info', entrypoint: 'inspector', parent: 'main'),
     ];
 ```
+
+(`SurfaceSpec` also has `.toolPalette(...)` and `.overlay(...)`.)
 
 ## Talk between windows — `AppBus`
 
@@ -69,18 +92,15 @@ AppBus.on('doc.changed', (p) => reload(p['id'] as String));
 
 ## Surface lifecycle
 
-The runtime publishes lifecycle events on the same bus, so a surface can react
-when another opens or closes:
+The runtime publishes lifecycle events on the same bus, and a surface can drive
+its own window (it only ever acts on itself):
 
 ```dart
 AppBus.on('surface.destroyed', (p) => forgetDocFor(p['surfaceId'] as String));
-```
 
-A surface can also drive its own window:
-
-```dart
-await MorphicSurface.hide();
-await MorphicSurface.close();
+MorphicSurface.minimize();
+MorphicSurface.toggleMaximize();
+MorphicSurface.close();
 ```
 
 ## Native mode

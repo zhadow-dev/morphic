@@ -1,3 +1,13 @@
+## 0.2.0-dev.7
+
+* Fix README onboarding bugs (from a cold-start audit): `morphic:init` needs
+  `--apply` to install (without it, it's a dry run); the first-window example now
+  includes its `@pragma('vm:entry-point')` function; use the real `.toolPalette`
+  constructor and `MorphicSurface.minimize/close`.
+* Add the missing **Visual Studio “Desktop development with C++”** prerequisite
+  to the README and Quickstart.
+* `morphic:init` "Next" hint now uses the correct `runMorphicApp(app: ...)`.
+
 ## 0.2.0-dev.6
 
 * CLI now surfaces optional Spatial Mode in `morphic:init`, `morphic:doctor` and
