@@ -111,6 +111,14 @@ class DoctorCommand extends Command<int> {
             ? 'Some required checks failed. Resolve them before `morphic init`.'
             : 'Environment looks usable. Run `morphic init` for a dry-run plan.',
       );
+      env.out.writeln();
+      env.out.writeln(
+        'Spatial Mode (optional): shaped surfaces, materials, workspace composition.',
+      );
+      env.out.writeln('  Developer Preview — sign in:  dart run morphic:login');
+      env.out.writeln(
+        '  Learn more:                   https://www.getmorphic.space/spatial',
+      );
     }
     return hardFail ? MorphicExit.precondition : MorphicExit.ok;
   }

@@ -1,3 +1,11 @@
+## 0.2.0-dev.6
+
+* CLI now surfaces optional Spatial Mode in `morphic:init`, `morphic:doctor` and
+  `morphic --help` — a free Developer Preview pointer (`morphic:login` +
+  learn-more link), no paywall or pricing.
+* README rewritten as a pub.dev quickstart (install → first window →
+  multi-window → AppBus → lifecycle) with a small Spatial teaser.
+
 ## 0.2.0-dev.5
 
 * The licensing CLI now defaults to the hosted Morphic backend at

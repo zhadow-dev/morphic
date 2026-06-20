@@ -246,6 +246,18 @@ class InitCommand extends Command<int> {
         env.out.writeln(
           'Undo anytime:  dart run morphic:remove --apply',
         );
+        if (!manifest.spatial) {
+          // Natural Spatial discovery — no paywall, no pricing, just a pointer.
+          env.out.writeln('\n  Native Mode: enabled.');
+          env.out.writeln(
+            '\nWant Spatial Mode? Shaped surfaces, materials and workspace '
+            'composition (free Developer Preview).',
+          );
+          env.out.writeln('  Sign in:    dart run morphic:login');
+          env.out.writeln(
+            '  Learn more: https://www.getmorphic.space/spatial',
+          );
+        }
       }
       return MorphicExit.ok;
     } catch (e) {

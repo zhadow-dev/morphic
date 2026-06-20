@@ -9,11 +9,23 @@ import 'remove_command.dart';
 /// process environment; tests inject a sandboxed one.
 CommandRunner<int> buildMorphicRunner({CliEnvironment? environment}) {
   final env = environment ?? CliEnvironment();
-  return CommandRunner<int>(
-      'morphic',
-      'Install and manage the Morphic Windows runtime in a Flutter project.',
-    )
+  return _MorphicRunner()
     ..addCommand(DoctorCommand(env))
     ..addCommand(InitCommand(env))
     ..addCommand(RemoveCommand(env));
+}
+
+/// CommandRunner with a Spatial-discovery footer on `morphic --help`.
+class _MorphicRunner extends CommandRunner<int> {
+  _MorphicRunner()
+    : super(
+        'morphic',
+        'Install and manage the Morphic Windows runtime in a Flutter project.',
+      );
+
+  @override
+  String get usageFooter =>
+      '\nSpatial Mode (optional): shaped surfaces, materials, workspace composition.\n'
+      '  Sign in:    dart run morphic:login   (free Developer Preview)\n'
+      '  Learn more: https://www.getmorphic.space/spatial';
 }
