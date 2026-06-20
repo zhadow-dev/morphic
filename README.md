@@ -1,15 +1,30 @@
 # Morphic
 
-**A Flutter package that adds a native multi-surface runtime to your Flutter desktop app (Windows).**
+**Build real multi-window Flutter desktop apps. One app, many windows, zero Win32.**
 
-A normal Flutter desktop app is one window with one widget tree. Morphic lets one
-app present **many sovereign windows** — each its own Flutter engine — that the
-runtime orchestrates (geometry, z-order, activation, lifecycle) while staying
-agnostic to what any window contains. You author it all in Dart.
+A normal Flutter desktop app is one window with one widget tree. Morphic turns
+that same app into a runtime that presents **many sovereign native windows** —
+each its own Flutter engine — orchestrated for you (geometry, z-order,
+activation, lifecycle). You author it all in Dart.
 
-⚠️ Morphic is pre-1.0, Windows-only, and currently focused on desktop runtime stabilization.
+> ⚠️ Pre-1.0, **Windows-only** today. The install flow and native runtime are
+> scratch-verified, but APIs may still evolve.
 
-The install flow and native runtime are operational and scratch-verified, but APIs and runtime behavior may still evolve rapidly.
+## Install
+
+```bash
+flutter create my_app && cd my_app
+flutter pub add morphic
+dart run morphic:init        # patches windows/runner to host the runtime (reversible)
+flutter run -d windows
+```
+
+`morphic:init` hands process bootstrap to the Morphic runtime and materializes
+the runtime sources into `windows/runner/`. It leaves `lib/`, your pubspec, and
+every non-Windows platform untouched, and is fully reversible
+(`dart run morphic:remove`). **No C++, no CMake, no Win32.**
+
+## Your first window
 
 ```dart
 import 'package:morphic/morphic.dart';
@@ -27,62 +42,69 @@ class MyApp extends MorphicApp {
 }
 ```
 
-## Two runtime modes
+## Multiple windows
 
-Morphic has **two genuinely different runtime shapes** — not "the same thing with
-extra effects":
+Declare more surfaces — each becomes its own real window:
 
-- **Native mode** — orchestrated multi-window runtime. Sovereign OS windows;
-  closing the last one exits the app. The default, free.
-- **Spatial mode** — a composited spatial runtime: GPU-composited, shaped,
-  materialized surfaces inside a persistent shell. *Premium.*
-
-See **[doc/RUNTIME_MODES.md](doc/RUNTIME_MODES.md)**.
-
-## Install & first run
-
-```bash
-flutter create my_app && cd my_app
-flutter pub add morphic
-dart run morphic:init        # transforms windows/runner to host the runtime (reversible)
-# point main() at runMorphicApp(...), then:
-flutter run -d windows
+```dart
+@override
+List<SurfaceSpec> surfaces() => const [
+      SurfaceSpec.workspace(id: 'editor', entrypoint: 'editor'),
+      SurfaceSpec.inspector(id: 'inspector', entrypoint: 'inspector'),
+      SurfaceSpec.palette(id: 'tools', entrypoint: 'tools'),
+    ];
 ```
 
-`dart run morphic:init` patches your Windows runner to hand process bootstrap to
-the Morphic runtime and materializes the runtime sources into `windows/runner/`.
-It leaves `lib/`, your pubspec config, and every non-Windows platform untouched,
-and is fully reversible (`dart run morphic:remove`). **No C++, no CMake, no Win32.**
+## Talk between windows — `AppBus`
 
-Full walkthrough → **[doc/QUICKSTART.md](doc/QUICKSTART.md)**.
+Surfaces are isolated engines, so they share state through a tiny event bus:
 
-## Documentation
+```dart
+// in the editor window
+AppBus.broadcast('doc.changed', {'id': docId});
+
+// in the inspector window
+AppBus.on('doc.changed', (p) => reload(p['id'] as String));
+```
+
+## Surface lifecycle
+
+The runtime publishes lifecycle events on the same bus, so a surface can react
+when another opens or closes:
+
+```dart
+AppBus.on('surface.destroyed', (p) => forgetDocFor(p['surfaceId'] as String));
+```
+
+A surface can also drive its own window:
+
+```dart
+await MorphicSurface.hide();
+await MorphicSurface.close();
+```
+
+## Native mode
+
+The above is **native mode** — orchestrated real OS windows, the default and
+free. Closing the last window exits the app. No account or network required.
+
+## Docs
 
 | Doc | For |
 |---|---|
-| [QUICKSTART](doc/QUICKSTART.md) | Install → first surface → run, in ~10 minutes |
-| [CONCEPTS](doc/CONCEPTS.md) | What a surface/workspace is and *why* Morphic works this way |
+| [Quickstart](doc/QUICKSTART.md) | Install → first surface → run, in ~10 minutes |
+| [Concepts](doc/CONCEPTS.md) | What a surface / workspace is, and why Morphic works this way |
 | [SDK](doc/SDK.md) | The `package:morphic` API + copy-paste patterns |
-| [INTEGRATION](doc/INTEGRATION.md) | How `morphic init` installs the runtime |
-| [RUNTIME_MODES](doc/RUNTIME_MODES.md) | Native vs spatial — the two runtime shapes |
-| [ARCHITECTURE](ARCHITECTURE.md) | How the runtime works internally |
-| [doc/internals/](doc/internals/) | Deep systems investigations (not needed to use Morphic) |
+| [Integration](doc/INTEGRATION.md) | How `morphic:init` installs the runtime |
+| [CLI](doc/CLI.md) | The `dart run morphic:*` commands |
 
-## Status & engineering signals
+`example/` is a showcase / playground, not where you author your own app — that's
+`package:morphic` in your own project.
 
-Pre-1.0 and evolving, but the runtime core is stabilized and the consumption path
-is real:
+## Spatial Mode
 
-- The install path is **scratch-verified** (init → build → run → remove, on a
-  clean `flutter create` app).
-- A runtime **invariant assertion layer**, an explicit **lifecycle/teardown state
-  machine**, and an **engine-retention** model are all in place and behaviorally
-  verified.
-- Native and spatial are **separate, verified runtime tiers** (the native tier
-  compiles and runs with zero spatial dependencies).
+Morphic also supports an optional **Spatial Runtime** for shaped surfaces,
+materials, acrylic effects, workspace composition and advanced desktop
+experiences.
 
-`example/` is a **showcase / playground / reference app**, not the place you
-author your own app — that's `package:morphic` in your own project.
-
-> The pre-pivot Dart API (`MorphicController` / `createSurface` / "Studio") is a
-> dead lineage, quarantined under `legacy/`. Ignore it.
+Learn more → **https://www.getmorphic.space/spatial**
