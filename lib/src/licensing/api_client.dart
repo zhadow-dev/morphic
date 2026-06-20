@@ -12,11 +12,11 @@ class MorphicApi {
     : apiUrl =
           apiUrl ??
           Platform.environment['MORPHIC_API_URL'] ??
-          'https://api.morphic.dev',
+          'https://www.getmorphic.space/api',
       siteUrl =
           siteUrl ??
           Platform.environment['MORPHIC_SITE_URL'] ??
-          'https://morphic.dev',
+          'https://www.getmorphic.space',
       _http = client ?? http.Client();
 
   final String apiUrl;

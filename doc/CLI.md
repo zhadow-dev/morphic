@@ -23,8 +23,8 @@ to point them at one:
 
 ```bash
 # Set these before using the licensing commands (they have no public default):
-export MORPHIC_API_URL="https://<your-morphic-backend>/api"
-export MORPHIC_SITE_URL="https://<your-morphic-backend>"   # hosts the browser login page
+export MORPHIC_API_URL="https://www.getmorphic.space/api"
+export MORPHIC_SITE_URL="https://www.getmorphic.space"   # hosts the browser login page
 ```
 
 | Command | What it does |
