@@ -83,11 +83,32 @@ class NotesStore {
     AppBus.broadcast('notes.changed', {'id': note.id});
   }
 
+  /// A fresh, untitled note at the top of the list.
   static Note create() {
-    final note = Note(id: 'n${DateTime.now().millisecondsSinceEpoch}');
+    final note = Note(id: 'n${DateTime.now().millisecondsSinceEpoch}', title: '');
     _saveAll(load()..insert(0, note));
     AppBus.broadcast('notes.changed', {'id': note.id});
     return note;
+  }
+
+  /// Remove a note. Returns it (with its old index) so a delete can be undone.
+  static (Note, int)? delete(String id) {
+    final notes = load();
+    final i = notes.indexWhere((n) => n.id == id);
+    if (i < 0) return null;
+    final removed = notes.removeAt(i);
+    _saveAll(notes);
+    AppBus.broadcast('notes.changed', {'id': id});
+    AppBus.broadcast('note.deleted', {'id': id});
+    return (removed, i);
+  }
+
+  /// Re-insert a note at a position (the inverse of [delete], for Undo).
+  static void insertAt(Note note, int index) {
+    final notes = load();
+    notes.insert(index.clamp(0, notes.length), note);
+    _saveAll(notes);
+    AppBus.broadcast('notes.changed', {'id': note.id});
   }
 
   static List<Note> _seed() {

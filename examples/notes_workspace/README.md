@@ -21,9 +21,25 @@ dart run morphic:init --apply          # host the Morphic runtime (reversible)
 flutter run -d windows
 ```
 
-Three windows open. Pick a note in the List → it opens in the Editor and the
-Inspector updates live. Type → it saves. Close the app and reopen — your notes
-are still there.
+Three windows open and the most recent note is already loaded. Pick a note in the
+List → it opens in the Editor and the Inspector updates live. Type → it autosaves.
+Close the app and reopen — your notes are still there.
+
+## Use it like real software
+
+| Action | How |
+| --- | --- |
+| New note | `Ctrl+N` or the **+** button |
+| Rename | `F2`, or double-click a row |
+| Delete | `Del` (with an **Undo** snackbar) or the trash icon on hover |
+| Move selection | `↑` / `↓` |
+| Save now | `Ctrl+S` (it also autosaves while you type) |
+| Close the editor window | `Ctrl+W` |
+
+> **One honest rough edge:** `Ctrl+N` focuses the Editor's title field, but the
+> Editor is a *separate OS window* — so on Windows you click it once before typing
+> the new title. Cross-window activation is an SDK gap, not an app bug; it's on the
+> backlog precisely because using the app surfaced it.
 
 ## What it demonstrates
 

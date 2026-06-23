@@ -1,0 +1,32 @@
+[
+  {
+    "id": "n_roadmap",
+    "title": "Roadmap — week of Jun 23",
+    "body": "Priority 1: make Notes Workspace usable as real software, not a demo.\n\n- note creation, delete, rename\n- keyboard shortcuts (Ctrl+N, F2, Del, arrows)\n- visual polish: spacing, typography, hover + selected states\n\nThen actually use it for five minutes. If I won't, nobody will.",
+    "updated": "2026-06-23T09:41:00.000"
+  },
+  {
+    "id": "n_appbus",
+    "title": "How the three windows talk",
+    "body": "List, Editor and Inspector are separate windows — separate Flutter engines — in one process. They never reach into each other. They persist to a shared JSON file and broadcast over AppBus; each window reloads on the topics it cares about.\n\nThat single rule is the whole multi-window model.",
+    "updated": "2026-06-23T08:12:00.000"
+  },
+  {
+    "id": "n_shortcuts",
+    "title": "Shortcuts to remember",
+    "body": "Ctrl+N  new note\nF2      rename (or double-click a row)\nDel     delete (with undo)\n↑ / ↓   move selection\nCtrl+S  save now (it also autosaves)\nCtrl+W  close the editor window",
+    "updated": "2026-06-22T19:30:00.000"
+  },
+  {
+    "id": "n_groceries",
+    "title": "Groceries",
+    "body": "oat milk\ncoffee\nolive oil\nspinach\nthe good bread",
+    "updated": "2026-06-22T17:05:00.000"
+  },
+  {
+    "id": "n_idea",
+    "title": "Idea: spatial inspector",
+    "body": "What if the inspector could float as a shaped, translucent surface over the editor instead of a rectangle beside it? Park it for the preview program — earn it through use first.",
+    "updated": "2026-06-21T22:48:00.000"
+  }
+]
