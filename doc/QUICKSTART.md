@@ -3,6 +3,14 @@
 A working Morphic app — a real, sovereign desktop window authored in Dart — in
 about 10 minutes. No spatial concepts, no Win32, no C++.
 
+## What you'll build
+
+A multi-window desktop app from one Dart codebase. Want the finished thing first?
+Clone the **[Notes Workspace example](../examples/notes_workspace)** — a notes
+List, an Editor and a live Inspector as three native windows, synced over `AppBus`:
+
+![Notes Workspace — three native windows from one Flutter app](../assets/notes-multiwindow.png)
+
 ## 0. Prerequisites
 
 - **Flutter** with Windows desktop enabled (`flutter config --enable-windows-desktop`).

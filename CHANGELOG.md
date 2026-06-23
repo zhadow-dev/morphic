@@ -1,3 +1,9 @@
+## 0.2.0-dev.10
+
+* Docs/onboarding: the README now leads with the **Notes Workspace** example
+  (screenshot + clone-&-run) before any architecture, and the Quickstart gains a
+  "What you'll build." No code changes.
+
 ## 0.2.0-dev.9
 
 * **Fix `dart run morphic:init` failing with "asset hash mismatch … regenerate

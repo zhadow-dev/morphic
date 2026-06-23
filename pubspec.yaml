@@ -1,6 +1,6 @@
 name: morphic
 description: "Multi-window framework for Flutter desktop: build real windows, inspectors, tool palettes, detached panels, workspaces and spatial surfaces from one Dart codebase."
-version: 0.2.0-dev.9
+version: 0.2.0-dev.10
 homepage: https://github.com/zhadow-dev/morphic
 repository: https://github.com/zhadow-dev/morphic
 issue_tracker: https://github.com/zhadow-dev/morphic/issues

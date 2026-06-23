@@ -10,6 +10,24 @@ activation, lifecycle). You author it all in Dart.
 > ⚠️ Pre-1.0, **Windows-only** today. The install flow and native runtime are
 > scratch-verified, but APIs may still evolve.
 
+## See it
+
+![Notes Workspace — a notes list, an editor and a live inspector as three native windows from one Flutter app](assets/notes-multiwindow.png)
+
+The **[Notes Workspace example](examples/notes_workspace)** is a real app you can
+run in a minute: a notes **List**, an **Editor** and a live **Inspector** as three
+separate native windows, kept in sync over `AppBus`, with edits that persist across
+relaunch. ~250 lines of Dart, zero Win32.
+
+```bash
+git clone https://github.com/zhadow-dev/morphic
+cd morphic/examples/notes_workspace
+flutter create --platforms=windows .   # scaffold the windows/ runner
+flutter pub get
+dart run morphic:init --apply
+flutter run -d windows
+```
+
 ## Prerequisites
 
 - **Flutter** (desktop enabled): `flutter config --enable-windows-desktop`
