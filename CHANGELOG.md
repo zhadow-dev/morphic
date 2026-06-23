@@ -1,3 +1,11 @@
+## 0.2.0-dev.9
+
+* **Fix `dart run morphic:init` failing with "asset hash mismatch … regenerate
+  manifest".** The bundled runtime manifest had stale checksums for 5 runtime
+  source files, so init aborted before hosting the runtime. Checksums are
+  regenerated to match the shipped sources; init applies cleanly again. Found by
+  building the `notes_workspace` example from a clean checkout.
+
 ## 0.2.0-dev.8
 
 * New `dart run morphic:license` — shows your tier (Developer Preview),

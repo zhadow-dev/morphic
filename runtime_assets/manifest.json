@@ -60,7 +60,7 @@
     {
       "source": "windows/runner_morphic/engine_state.h",
       "target": "windows/runner/engine_state.h",
-      "sha256": "2db36e0e01644f34407ac58bab51fc152c8b432fff31f9d6171e7a6a38397560",
+      "sha256": "b139b49a2d9f5f2193798a31b24d143c25d8d2980bbfb4f9f00bc21b361b5572",
       "kind": "runtime_source"
     },
     {
@@ -126,7 +126,7 @@
     {
       "source": "windows/runner_morphic/morphic_runtime.cpp",
       "target": "windows/runner/morphic_runtime.cpp",
-      "sha256": "fea2ac7d217c4ddd3269ace244215f86e1655730033a16db6fc2b0262f3aeb06",
+      "sha256": "60726f021b2c7a4f670eeec504497380f25165e4bb9d7d96d66c86772e5ec1b8",
       "kind": "runtime_source"
     },
     {
@@ -222,7 +222,7 @@
     {
       "source": "windows/runner_morphic/process_lifecycle.h",
       "target": "windows/runner/process_lifecycle.h",
-      "sha256": "5d3ecd948ca85deb26418303a2cb58fb5d2f9c5acd434bedb7ae1e83ca1a41cc",
+      "sha256": "bcb4ae86567fdc0e803ccb5ed4796886babcdeb51126491cc03103bcb26876f8",
       "kind": "runtime_source"
     },
     {
@@ -306,7 +306,7 @@
     {
       "source": "windows/runner_morphic/surface_manager.cpp",
       "target": "windows/runner/surface_manager.cpp",
-      "sha256": "8a30ab4aed924ab022955024ac8946a3b1eb2b60809d796ed1b8a568908975e4",
+      "sha256": "ba72c19e40652308941c31c18456f88468af15a53e13a04590c4aaeb2e587cd1",
       "kind": "runtime_source"
     },
     {
@@ -666,7 +666,7 @@
     {
       "source": "windows/runner_morphic/window_topology.h",
       "target": "windows/runner/window_topology.h",
-      "sha256": "8fc3edf1ada62f89646b9e8f794698bd8becca9b41c6dba772087f3fea89ec51",
+      "sha256": "7154854c8a512309d16c62610e7c6d26c5d4b62f4f271b2f7693714b110e6d55",
       "kind": "runtime_source"
     },
     {
