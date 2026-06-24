@@ -15,16 +15,24 @@ flutter run -d windows
 runtime into your Windows runner. No sign-in, no backend, no internet required.
 This is all most apps need.
 
-## Licensing CLI — experimental
+## Spatial access & licensing — experimental
 
-The premium **spatial** runtime is delivered through an authenticated flow.
-These commands talk to a **Morphic backend**, so they're opt-in and require you
-to point them at one:
+The optional **spatial** runtime is a free **Developer Preview**, delivered
+through an authenticated flow. Native mode needs no account — this is only for
+spatial. Three steps:
 
 ```bash
-# Set these before using the licensing commands (they have no public default):
-export MORPHIC_API_URL="https://www.getmorphic.space/api"
-export MORPHIC_SITE_URL="https://www.getmorphic.space"   # hosts the browser login page
+dart run morphic:login                    # browser sign-in (Google) — no key to paste
+dart run morphic:license                  # shows your tier + spatial access
+dart run morphic:init --spatial --apply   # secure delivery + install
+```
+
+The commands talk to `https://www.getmorphic.space` by default. To point them at
+a different backend, override:
+
+```bash
+export MORPHIC_API_URL="https://your-backend/api"
+export MORPHIC_SITE_URL="https://your-backend"   # hosts the browser login page
 ```
 
 | Command | What it does |
@@ -33,7 +41,7 @@ export MORPHIC_SITE_URL="https://www.getmorphic.space"   # hosts the browser log
 | `dart run morphic:whoami` | Shows the signed-in account, plan and spatial access. |
 | `dart run morphic:license` | Shows your license: tier (Developer Preview), projects, spatial access and activation status. |
 | `dart run morphic:logout` | Revokes the session and clears local credentials. |
-| `dart run morphic:init --spatial` | Authenticated secure delivery of the spatial runtime: **authorize → short-TTL signed URL → download → SHA-256 verify → install**, then runs `init`. |
+| `dart run morphic:init --spatial --apply` | Authenticated secure delivery of the spatial runtime: **authorize → short-TTL signed URL → download → SHA-256 verify → install**, then runs `init`. (Like `init`, needs `--apply`.) |
 
 Credentials are stored per-OS:
 
@@ -46,6 +54,6 @@ Credentials are stored per-OS:
 A long-lived **refresh token** is stored; short-lived access tokens are fetched
 on demand, so a login keeps working across sessions.
 
-> **Status:** the licensing / spatial-delivery flow is experimental and needs a
-> running Morphic backend. Without `MORPHIC_API_URL` set, `morphic:login` has no
-> endpoint to reach. The native `morphic:init` path above is unaffected.
+> **Status:** the licensing / spatial-delivery flow is experimental and depends
+> on the Morphic backend being reachable (it defaults to `getmorphic.space`). The
+> native `morphic:init` path is unaffected and needs no account.
