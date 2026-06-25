@@ -65,4 +65,4 @@ lib/
   store.dart      # Note model + file persistence + AppBus broadcasts
 ```
 
-> Authored against `morphic ^0.2.0-dev.8`. APIs are pre-1.0 and may evolve.
+> Authored against `morphic ^0.2.0-dev.11`. APIs are pre-1.0 and may evolve.

@@ -37,7 +37,7 @@ Future<void> main(List<String> args) async {
 
     stdout.writeln('\n✓ Logged in as ${result.email}');
     stdout.writeln('  Plan: ${result.plan}');
-    stdout.writeln('  Next: dart run morphic:init --spatial');
+    stdout.writeln('  Next: dart run morphic:init --spatial --apply');
     exit(0);
   } on Object catch (e) {
     stderr.writeln('\nLogin failed: $e');

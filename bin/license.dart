@@ -27,7 +27,7 @@ Future<void> main(List<String> args) async {
     stdout.writeln('  Spatial:   ${spatial ? 'Enabled' : 'Not included'}');
     stdout.writeln('  Status:    Activated');
     if (spatial) {
-      stdout.writeln('\nInstall the spatial runtime:  dart run morphic:init --spatial');
+      stdout.writeln('\nInstall the spatial runtime:  dart run morphic:init --spatial --apply');
     }
     exit(0);
   } on MorphicApiException catch (e) {

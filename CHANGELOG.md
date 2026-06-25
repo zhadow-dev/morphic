@@ -1,3 +1,22 @@
+## 0.2.0-dev.11
+
+Easier to discover, install, and learn. No public API changes.
+
+* **Clear positioning** — Morphic is now described consistently everywhere as
+  *a Flutter Desktop runtime for building real multi-window applications in pure
+  Dart*: README, pub.dev, the website, and a new **What is Morphic?** page, plus a
+  developer FAQ (what it is, why not `desktop_multi_window`, Win32?, platforms).
+* **pub.dev metadata** — sharper description; topics now `flutter-desktop`,
+  `multi-window`, `window-management`, `desktop`, `runtime`; `homepage` points to
+  getmorphic.space with a `documentation` link.
+* **Canonical example** — `example/` is now a minimal, runnable two-window +
+  `AppBus` quickstart. The fuller showcase lives in `examples/notes_workspace`.
+* **Docs corrections** — every install/spatial command uses `--apply` (including
+  the `morphic:login`/`morphic:license` CLI hints); commands verified against the
+  example.
+* **Smaller, cleaner package** — removed internal/validation, quarantined-legacy,
+  and generated artifacts from the published package.
+
 ## 0.2.0-dev.10
 
 * Docs/onboarding: the README now leads with the **Notes Workspace** example
