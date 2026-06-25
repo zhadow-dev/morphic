@@ -1,9 +1,10 @@
 name: morphic
-description: "Multi-window framework for Flutter desktop: build real windows, inspectors, tool palettes, detached panels, workspaces and spatial surfaces from one Dart codebase."
+description: "A Flutter desktop runtime for building real multi-window applications in pure Dart: native OS windows, window orchestration, and cross-window messaging."
 version: 0.2.0-dev.10
-homepage: https://github.com/zhadow-dev/morphic
+homepage: https://www.getmorphic.space
 repository: https://github.com/zhadow-dev/morphic
 issue_tracker: https://github.com/zhadow-dev/morphic/issues
+documentation: https://www.getmorphic.space/docs
 
 screenshots:
   - description: "Three native windows — List, Editor, Inspector — from one Flutter app (the notes_workspace example)."
@@ -87,8 +88,8 @@ flutter:
   # https://flutter.dev/to/font-from-package
 
 topics:
-  - flutter
-  - desktop
+  - flutter-desktop
   - multi-window
-  - window-manager
-  - spatial-ui
+  - window-management
+  - desktop
+  - runtime

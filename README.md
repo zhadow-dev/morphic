@@ -1,11 +1,34 @@
 # Morphic
 
-**Build real multi-window Flutter desktop apps. One app, many windows, zero Win32.**
+**Morphic is a Flutter Desktop runtime for building real multi-window applications in pure Dart.** It lets you create and orchestrate multiple native desktop windows from a single Flutter application — without writing Win32 or platform-specific windowing code.
 
-A normal Flutter desktop app is one window with one widget tree. Morphic turns
-that same app into a runtime that presents **many sovereign native windows** —
-each its own Flutter engine — orchestrated for you (geometry, z-order,
-activation, lifecycle). You author it all in Dart.
+Each window is its own Flutter engine; Morphic manages their geometry, z-order,
+activation and lifecycle for you. You write ordinary Dart; Morphic gives your
+existing UI real OS windows.
+
+> **Morphic is not a UI kit, a widget library, or a design system, and has nothing
+> to do with neumorphism.** It does not draw widgets, themes, or animations. Your
+> Flutter widgets stay exactly as they are — Morphic is the *runtime* that hosts
+> them across multiple native windows.
+
+**Why it exists.** Flutter Desktop gives you one window with one widget tree. Real
+desktop software — code editors, IDEs, DAWs, trading and monitoring dashboards,
+creative tools — is **multi-window**: inspectors, tool palettes, detached panels,
+and whole workspaces. Doing that in Flutter used to mean dropping to C++/Win32.
+Morphic makes multi-window a first-class, Dart-only part of your app.
+
+| | |
+|---|---|
+| **What it is** | A Flutter **desktop runtime** / multi-window app framework |
+| **You write** | Pure Dart — your normal Flutter widgets, unchanged |
+| **You get** | Real native OS windows, orchestrated: surfaces, ownership, z-order, lifecycle |
+| **Windows talk via** | `AppBus` — message passing; windows never reach into each other |
+| **For** | Flutter devs building professional desktop apps (IDE-style, creative, dashboards) |
+| **Platforms** | Windows today · macOS & Linux on the roadmap |
+
+Think of it as the **multi-window layer Flutter Desktop is missing** — closer to a
+windowing runtime than a package. See how it compares to `desktop_multi_window`
+and vanilla Flutter desktop at **[getmorphic.space/compare](https://www.getmorphic.space/compare)**.
 
 > ⚠️ Pre-1.0, **Windows-only** today. The install flow and native runtime are
 > scratch-verified, but APIs may still evolve.
@@ -125,6 +148,58 @@ MorphicSurface.close();
 
 The above is **native mode** — orchestrated real OS windows, the default and
 free. Closing the last window exits the app. No account or network required.
+
+## Frequently Asked Questions
+
+*Full version, with framework comparisons: [What is Morphic?](https://www.getmorphic.space/what-is-morphic)*
+
+### What is Morphic?
+
+Morphic is a Flutter Desktop runtime for building real multi-window applications
+in pure Dart. It lets one Flutter application create and orchestrate multiple
+native desktop windows without writing Win32 or platform-specific windowing code.
+
+### Is Morphic a UI or widget library?
+
+No. Morphic does not replace Flutter's widget system — you keep building your UI
+with Flutter widgets exactly as you do today. Morphic adds a desktop *runtime*
+above Flutter that manages multiple native windows, orchestration, lifecycle, and
+cross-window communication.
+
+### Is Morphic a replacement for Flutter?
+
+No. Flutter renders your application; Morphic extends Flutter Desktop with the
+capabilities professional desktop software needs — multiple native windows,
+workspace layouts, tool palettes, inspectors, and window-to-window messaging.
+
+### How is Morphic different from `desktop_multi_window`?
+
+Both let a Flutter app open multiple windows. Morphic is a desktop **runtime**
+rather than a window-spawning utility: it adds window orchestration, `AppBus`
+messaging, surface lifecycles, reusable workspace patterns, and an upgrade path to
+the Spatial Runtime. (Side-by-side table: [getmorphic.space/compare](https://www.getmorphic.space/compare).)
+
+### Does Morphic require Win32 or platform-specific code?
+
+No. You create and manage windows entirely from Dart; the platform-specific
+implementation is handled internally by Morphic.
+
+### Is Morphic only for Windows?
+
+Today Morphic targets Flutter Desktop on **Windows**. macOS and Linux are planned
+as the runtime evolves — the layered design exists so the upper layers carry over.
+
+### What is the Spatial Runtime?
+
+An optional extension that enables spatial desktop composition and advanced
+workspace capabilities. It builds on the same APIs as the open-source runtime, so
+applications can adopt it without changing their architecture.
+
+### Who should use Morphic?
+
+Developers building professional desktop software — IDEs, design and engineering
+tools, creative apps, dashboard workspaces, trading platforms, data-analysis
+tools, and multi-monitor productivity apps.
 
 ## Docs
 
