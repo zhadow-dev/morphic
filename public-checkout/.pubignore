@@ -1,0 +1,8 @@
+# Cold-start validation kit (repo-only)
+cold-start/
+
+# Standalone clonable examples (repo-only; the pub.dev example is example/)
+examples/
+
+# Asset-capture scripts (repo-only; consumers don't need them)
+tools/

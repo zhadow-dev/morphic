@@ -1,0 +1,5 @@
+# Runtime sources are checksummed in runtime_assets/manifest.json. Any line-ending
+# conversion on checkout changes their bytes and breaks `morphic:init` with an
+# "asset hash mismatch". Treat them as binary so bytes are identical on every
+# platform/clone and always match the manifest.
+runtime_assets/** -text
