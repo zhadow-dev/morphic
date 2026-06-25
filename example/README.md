@@ -1,17 +1,31 @@
-# morphic_example
+# Morphic quickstart
 
-Demonstrates how to use the morphic plugin.
+The smallest meaningful Morphic app: **one Flutter app, two real native windows,
+kept in sync over `AppBus`.** Window 1 owns a counter; window 2 is a separate
+Flutter engine that mirrors it live. Neither window reaches into the other.
 
-## Getting Started
+It's all in [`lib/main.dart`](lib/main.dart) — ~110 lines, zero Win32.
 
-This project is a starting point for a Flutter application.
+## Run it (Windows)
 
-A few resources to get you started if this is your first Flutter project:
+From a clone of this repository:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+cd example
+flutter create --platforms=windows .   # scaffold the windows/ runner
+flutter pub get
+dart run morphic:init --apply          # host the Morphic runtime (reversible)
+flutter run -d windows
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Two windows open. Use +/− in **Counter** and watch **Live mirror** update.
+
+## Where to go next
+
+- A fuller, real app: the [Notes Workspace example](../examples/notes_workspace)
+  (list · editor · live inspector, with persistence).
+- [What is Morphic?](https://www.getmorphic.space/what-is-morphic) ·
+  [Docs](https://www.getmorphic.space/docs)
+
+> Uses `morphic` from the repository (`path: ../`). Authored against
+> `morphic ^0.2.0-dev.10`; APIs are pre-1.0 and may evolve.

@@ -1,79 +1,122 @@
+// Morphic quickstart — the smallest meaningful multi-window app.
+//
+// One Flutter app boots TWO real native windows. The first owns a value; the
+// second is a separate Flutter engine that mirrors it live over `AppBus`. Neither
+// window reaches into the other — they only broadcast and react.
 import 'package:flutter/material.dart';
-
-import 'forensic.dart';
-import 'ecology_launcher.dart';
 import 'package:morphic/morphic.dart';
-import 'notes_app/notes_app.dart';
-import 'habitat_app/habitat_app.dart';
-import 'spatial_home_app/spatial_home_app.dart';
 
-// PHASE 10.2 — export per-role entrypoints so the native SurfaceShell engines
-// can resolve them by name and they survive tree-shaking. Each runs in its own
-// engine inside a SurfaceShell HWND. main() runs the ecology launcher (the
-// control surface).
-export 'workspace_content.dart';
-export 'tool_palette_content.dart';
-export 'inspector_content.dart';
-export 'overlay_content.dart';
+const _count = 'count'; // the AppBus topic both windows share
 
-// MORPHIC SECOND APP (M2.2) — "Notes" app surfaces. Run their own entrypoints inside
-// workspace/inspector/palette-KIND surfaces via the friction-#1 entrypoint override (Dart-only,
-// no C++ per surface type). This is the real-app pressure that lets the SDK discover itself.
-export 'notes_app/notes_editor.dart';
-export 'notes_app/notes_inspector.dart';
-export 'notes_app/notes_command_palette.dart';
-export 'notes_app/notes_palette.dart';
+// Each window is an ordinary Flutter app behind a named, tree-shake-safe
+// entrypoint the runtime launches by name.
+@pragma('vm:entry-point')
+void mainWindow() => runApp(const _App(home: CounterWindow()));
 
-// MORPHIC SHOWCASE (M2.8) — "Habitat" spatial-native scene entrypoints (each its own engine).
-export 'habitat_app/presence_field.dart';
-export 'habitat_app/memory_echoes.dart';
-export 'habitat_app/ambient_context.dart';
+@pragma('vm:entry-point')
+void mirrorWindow() => runApp(const _App(home: MirrorWindow()));
 
-// MORPHIC SHOWCASE — "Spatial Home" (scene 02): the visionOS-style control hub built from
-// chromeless rounded glass surfaces on one composition plane.
-export 'spatial_home_app/home_panel.dart';
-export 'spatial_home_app/home_header.dart';
-export 'spatial_home_app/home_sidebar.dart';
-export 'spatial_home_app/home_rooms.dart';
-export 'spatial_home_app/home_circle.dart';
-export 'spatial_home_app/home_test_controls.dart'; // homeSpawnedMain (runtime spawn)
+class _App extends StatelessWidget {
+  const _App({required this.home});
+  final Widget home;
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData.dark(useMaterial3: true),
+    home: home,
+  );
+}
 
-// Legacy entrypoints (still used by stress/soak harnesses).
-export 'secondary_main.dart';
-export 'navbar_surface.dart';
-export 'editor_surface.dart';
+/// Declares the two windows that boot with the app.
+class QuickstartApp extends MorphicApp {
+  @override
+  String get name => 'Morphic Quickstart';
 
-// Boot selector. 'home' = the SPATIAL HOME showcase (visionOS-style control hub on chromeless
-// glass). 'habitat' (M2.8) = the Habitat presence scene. 'notes' = the SDK test/validation app
-// (the friction driver; still fully working). 'ecology' = the demo/lab launcher. One-line switch.
-const String _kBootApp = 'home';
+  @override
+  List<SurfaceSpec> surfaces() => const [
+    SurfaceSpec.workspace(id: 'main', entrypoint: 'mainWindow', width: 360, height: 300),
+    SurfaceSpec.workspace(id: 'mirror', entrypoint: 'mirrorWindow', x: 520, width: 280, height: 300),
+  ];
+}
 
-void main() {
-  Forensic.init();
-  if (_kBootApp == 'home') {
-    Forensic.log('BOOT', 'main() — runMorphicApp(app: SpatialHomeApp())');
-    runMorphicApp(app: SpatialHomeApp());
-    return;
+void main() => runMorphicApp(app: QuickstartApp());
+
+/// Window 1 — owns the value and broadcasts every change.
+class CounterWindow extends StatefulWidget {
+  const CounterWindow({super.key});
+  @override
+  State<CounterWindow> createState() => _CounterWindowState();
+}
+
+class _CounterWindowState extends State<CounterWindow> {
+  int _value = 0;
+
+  void _set(int v) {
+    setState(() => _value = v);
+    AppBus.broadcast(_count, {'value': v}); // tell the other window
   }
-  if (_kBootApp == 'habitat') {
-    Forensic.log('BOOT', 'main() — runMorphicApp(app: HabitatApp())');
-    runMorphicApp(app: HabitatApp());
-    return;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Counter')),
+    body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('$_value', style: Theme.of(context).textTheme.displayMedium),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton.filledTonal(
+                onPressed: () => _set(_value - 1),
+                icon: const Icon(Icons.remove),
+              ),
+              const SizedBox(width: 16),
+              IconButton.filledTonal(
+                onPressed: () => _set(_value + 1),
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text('A separate native window mirrors this live →'),
+        ],
+      ),
+    ),
+  );
+}
+
+/// Window 2 — a separate engine that reacts to AppBus, never touching window 1.
+class MirrorWindow extends StatefulWidget {
+  const MirrorWindow({super.key});
+  @override
+  State<MirrorWindow> createState() => _MirrorWindowState();
+}
+
+class _MirrorWindowState extends State<MirrorWindow> {
+  int _value = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    AppBus.on(_count, (p) => setState(() => _value = (p['value'] as int?) ?? 0));
   }
-  if (_kBootApp == 'notes') {
-    Forensic.log('BOOT', 'main() — runMorphicApp(app: NotesApp())');
-    runMorphicApp(app: NotesApp());
-    return;
-  }
-  Forensic.log('BOOT', 'main() entered — ecology launcher');
 
-  final binding = WidgetsFlutterBinding.ensureInitialized();
-  Forensic.log('BOOT', 'WidgetsFlutterBinding.ensureInitialized done');
-
-  binding.addPostFrameCallback((_) {
-    Forensic.log('FRAME', 'first widget frame rendered (post-frame callback)');
-  });
-
-  Forensic.log('BOOT', 'calling runApp(EcologyLauncher)');
-  runApp(const EcologyLauncher());
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Live mirror')),
+    body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('value'),
+          Text('$_value', style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: 12),
+          const Text('doubled'),
+          Text('${_value * 2}', style: Theme.of(context).textTheme.headlineMedium),
+        ],
+      ),
+    ),
+  );
 }
