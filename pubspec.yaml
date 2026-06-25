@@ -1,6 +1,6 @@
 name: morphic
 description: "A Flutter desktop runtime for building real multi-window applications in pure Dart: native OS windows, window orchestration, and cross-window messaging."
-version: 0.2.0-dev.11
+version: 0.2.0-dev.12
 homepage: https://www.getmorphic.space
 repository: https://github.com/zhadow-dev/morphic
 issue_tracker: https://github.com/zhadow-dev/morphic/issues

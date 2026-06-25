@@ -1,3 +1,15 @@
+## 0.2.0-dev.12
+
+* **Fix `dart run morphic:init --spatial` failing with "asset hash mismatch for
+  windows/runner_morphic/engine_state.h".** `manifest_spatial.json` carried stale
+  (pre-line-ending-normalization) checksums for 5 runtime files — the dev.9 fix
+  regenerated only the native `manifest.json`. Both manifests are now regenerated
+  from the source tree via `tool/gen_manifest.dart`. Native `init` was unaffected.
+* **Release-integrity gate** (`tools/verify-manifests.mjs` + CI): every release
+  path now fails if any runtime asset hash differs from `manifest.json` **or**
+  `manifest_spatial.json` — so a runtime whose files don't match the packaged
+  manifest can no longer be synced, zipped, or published.
+
 ## 0.2.0-dev.11
 
 Easier to discover, install, and learn. No public API changes.
