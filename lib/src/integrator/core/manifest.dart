@@ -16,9 +16,18 @@ class RuntimeManifest {
     required this.mainReplacement,
     required this.files,
     this.spatial = false,
+    this.packageVersion,
   });
 
+  /// The runtime ENGINE (ABI) version — stable across package releases. This is
+  /// not the pub.dev package version; see [packageVersion].
   final String runtimeVersion;
+
+  /// The `package:morphic` version this manifest shipped with (the pub.dev /
+  /// spatial-artifact version). Null on manifests generated before this field
+  /// existed. Distinct from [runtimeVersion]: the package can release many
+  /// times while the runtime engine ABI stays put.
+  final String? packageVersion;
 
   /// Whether this is the SPATIAL (premium) tier. The native tier excludes the
   /// `compositor_ng/` compositor sources and omits the GPU link stack +
@@ -37,6 +46,7 @@ class RuntimeManifest {
   factory RuntimeManifest.fromJson(Map<String, dynamic> json) =>
       RuntimeManifest(
         runtimeVersion: json['runtimeVersion'] as String,
+        packageVersion: json['packageVersion'] as String?,
         spatial: json['spatial'] as bool? ?? false,
         mainReplacement: ManifestEntry.fromJson(
           json['mainReplacement'] as Map<String, dynamic>,
@@ -49,6 +59,7 @@ class RuntimeManifest {
 
   Map<String, Object> toJson() => {
     'runtimeVersion': runtimeVersion,
+    if (packageVersion != null) 'packageVersion': packageVersion!,
     'spatial': spatial,
     'fileCount': files.length + 1,
     'mainReplacement': mainReplacement.toJson(),

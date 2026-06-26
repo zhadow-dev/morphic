@@ -134,9 +134,14 @@ class InitCommand extends Command<int> {
       env.out.writeln(
         'morphic init — ${apply ? 'APPLY' : 'DRY RUN'} for ${project.root}',
       );
-      env.out.writeln('  runtime version: ${manifest.runtimeVersion}');
+      if (manifest.packageVersion != null) {
+        env.out.writeln('  Morphic        ${manifest.packageVersion}  (package)');
+      }
       env.out.writeln(
-        '  tier: ${manifest.spatial ? 'spatial (premium)' : 'native'}',
+        '  Runtime engine ${manifest.runtimeVersion}  (ABI, stable across releases)',
+      );
+      env.out.writeln(
+        '  Tier           ${manifest.spatial ? 'spatial (premium)' : 'native'}',
       );
       for (final step in plan) {
         env.out.writeln('  • $step');
@@ -153,6 +158,8 @@ class InitCommand extends Command<int> {
             'mode': 'dry-run',
             'project': project.root,
             'runtimeVersion': manifest.runtimeVersion,
+            if (manifest.packageVersion != null)
+              'packageVersion': manifest.packageVersion,
             'spatial': manifest.spatial,
             'plan': plan,
           }),
@@ -230,6 +237,8 @@ class InitCommand extends Command<int> {
             'mode': 'apply',
             'project': project.root,
             'runtimeVersion': manifest.runtimeVersion,
+            if (manifest.packageVersion != null)
+              'packageVersion': manifest.packageVersion,
             'spatial': manifest.spatial,
             'actions': actions,
           }),

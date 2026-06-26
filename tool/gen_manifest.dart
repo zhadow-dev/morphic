@@ -11,9 +11,21 @@ import 'package:path/path.dart' as p;
 
 const String kRuntimeVersion = '0.1.0';
 
+/// The pub.dev package version, read from the package's own pubspec — the
+/// single source of truth. Distinct from [kRuntimeVersion] (the engine ABI).
+String _readPackageVersion() {
+  final pubspec = File(p.join(Directory.current.path, 'pubspec.yaml'));
+  for (final line in pubspec.readAsLinesSync()) {
+    final m = RegExp(r'^version:\s*(\S+)').firstMatch(line);
+    if (m != null) return m.group(1)!;
+  }
+  throw StateError('no `version:` in pubspec.yaml — run from package root.');
+}
+
 void main() {
   final assetsRoot = p.join(Directory.current.path, 'runtime_assets');
   final runnerSrc = p.join(assetsRoot, 'windows', 'runner_morphic');
+  final packageVersion = _readPackageVersion();
 
   if (!Directory(runnerSrc).existsSync()) {
     stderr.writeln(
@@ -66,6 +78,7 @@ void main() {
   void write({required bool spatial, required List<ManifestEntry> tierFiles}) {
     final manifest = RuntimeManifest(
       runtimeVersion: kRuntimeVersion,
+      packageVersion: packageVersion,
       spatial: spatial,
       mainReplacement: mainReplacement,
       files: tierFiles,
@@ -83,7 +96,7 @@ void main() {
     stdout.writeln(
       'Wrote ${out.path}: ${tierFiles.length} runtime sources + 1 main '
       'replacement (${spatial ? 'SPATIAL' : 'native'} tier, '
-      'runtimeVersion $kRuntimeVersion).',
+      'package $packageVersion, engine $kRuntimeVersion).',
     );
   }
 

@@ -1,5 +1,6 @@
 {
   "runtimeVersion": "0.1.0",
+  "packageVersion": "0.2.0-dev.13",
   "spatial": false,
   "fileCount": 127,
   "mainReplacement": {
@@ -766,5 +767,5 @@
       "kind": "runtime_source"
     }
   ],
-  "generated": "2026-06-25T11:33:44.559879Z"
+  "generated": "2026-06-26T04:10:24.891011Z"
 }

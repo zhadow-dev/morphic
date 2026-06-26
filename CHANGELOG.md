@@ -1,3 +1,12 @@
+## 0.2.0-dev.13
+
+* **Clearer `morphic:init` version output.** `init` printed only
+  `runtime version: 0.1.0` (the engine ABI), which read like a downgrade right
+  after delivering `spatial runtime v0.2.0-dev.12`. It now leads with the package
+  version and labels the engine ABI distinctly (`Morphic 0.2.0-dev.13 (package)` /
+  `Runtime engine 0.1.0 (ABI)`). The package version is now carried in the
+  manifest (`packageVersion`), sourced from `pubspec.yaml`.
+
 ## 0.2.0-dev.12
 
 * **Fix `dart run morphic:init --spatial` failing with "asset hash mismatch for

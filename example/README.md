@@ -28,4 +28,4 @@ Two windows open. Use +/− in **Counter** and watch **Live mirror** update.
   [Docs](https://www.getmorphic.space/docs)
 
 > Uses `morphic` from the repository (`path: ../`). Authored against
-> `morphic ^0.2.0-dev.12`; APIs are pre-1.0 and may evolve.
+> `morphic ^0.2.0-dev.13`; APIs are pre-1.0 and may evolve.
