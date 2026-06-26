@@ -26,5 +26,8 @@ abstract class MorphicApp {
   /// boot shell closes its own root surface after spawning — which is lifetime-safe because the scene's
   /// surfaces keep the count > 0, and closing them all later still quits cleanly (no zombie root). This
   /// is the showcase-scoped version of the deferred "separate runtime-root from visible presence".
+  ///
+  /// NOTE: the launcher coupling this works around is slated for removal in the
+  /// Runtime Core redesign (see doc/internals/runtime/). Do not build on it.
   bool get dissolveRootIntoScene => false;
 }

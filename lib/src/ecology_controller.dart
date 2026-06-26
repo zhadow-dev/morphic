@@ -244,4 +244,17 @@ class EcologyController {
     final result = await _channel.invokeMethod<Map>('ecology.summary');
     return result?.cast<String, dynamic>() ?? {};
   }
+
+  /// The native ids of every surface currently live in the ecology. Used by the
+  /// boot reconciler ([runMorphicApp]) to find surfaces left over from a previous
+  /// boot generation — a Flutter hot restart re-runs `main()` in the root isolate,
+  /// but the native runtime and its already-spawned surfaces persist.
+  Future<List<String>> currentSurfaceIds() async {
+    final summary = await getSummary();
+    final surfaces = (summary['surfaces'] as List?) ?? const [];
+    return [
+      for (final s in surfaces)
+        if (s is Map && s['id'] is String) s['id'] as String,
+    ];
+  }
 }

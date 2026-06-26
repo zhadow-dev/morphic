@@ -14,6 +14,27 @@ import 'surface_spec.dart';
 
 final EcologyController _ecology = EcologyController();
 
+/// DX — SESSION RECONCILIATION (P1). A Flutter **hot restart** re-runs `main()`
+/// in the root isolate, but the native runtime and the surfaces it has already
+/// spawned are C++-owned and survive the restart — so a naive re-spawn stacks
+/// duplicate windows (1 → 2 → 3 …).
+///
+/// The fix is generation-aware boot: snapshot the surfaces that exist *before*
+/// this boot spawns (orphans from the previous generation), spawn this boot's
+/// surfaces, then reap ONLY those orphans. Reaping AFTER spawning keeps the live
+/// surface count > 0 throughout, so it can never trip the runtime's "last surface
+/// closed → exit". Cold start: the snapshot is empty, so this is a no-op (and in
+/// production `main()` runs once, so there are never orphans).
+///
+/// Set to `false` for instant rollback to the legacy (duplicating) boot.
+const bool kSessionReconcile = true;
+
+/// The fixed native id of the bootstrap launcher surface (it runs the app's
+/// `main()`). It persists across a hot restart, so the P1 reconciler must NEVER
+/// reap it — doing so would destroy the very engine running this code. Matches
+/// the id the native runtime spawns the launcher with.
+const String _kLauncherSurfaceId = 'launcher';
+
 /// Spawn an app's [SurfaceSpec]s, resolving in-spec `parent` references (app-local ids) to the
 /// real native ids. Returns the spec-id → native-id map. Pure orchestration over the raw channel;
 /// no widget composition, no fiction.
@@ -74,7 +95,29 @@ class _MorphicBootShellState extends State<_MorphicBootShell> {
       if (widget.app.dissolveRootIntoScene) {
         await MorphicSurface.hide();
       }
+      // P1 — snapshot orphan surfaces from a previous boot generation BEFORE we
+      // spawn this boot's surfaces. Best-effort: reconciliation must never block
+      // boot, so any channel error just falls back to the legacy behavior.
+      List<String> orphans = const [];
+      if (kSessionReconcile) {
+        try {
+          orphans = await _ecology.currentSurfaceIds();
+        } catch (_) {
+          orphans = const [];
+        }
+      }
       await spawnApp(widget.app);
+      // Reap ONLY the orphans, and only AFTER this boot's surfaces exist — so the
+      // live count stays > 0 and the runtime never sees "all surfaces closed".
+      // NEVER reap the bootstrap launcher: it is the surface running THIS main().
+      for (final id in orphans) {
+        if (id == _kLauncherSurfaceId) continue;
+        try {
+          await _ecology.destroySurface(id);
+        } catch (_) {
+          // best-effort; a failed reap just leaves one stale window, never a crash
+        }
+      }
       // M2.8 — a spatial-native scene IS its own app-presence; the boot root has no spatial meaning,
       // so it DISSOLVES once it has bootstrapped the surfaces. Closing (not hiding) keeps lifetime
       // honest: the scene's surfaces hold the count > 0 now, and closing them all later quits cleanly.

@@ -1,3 +1,19 @@
+## 0.2.0-dev.16
+
+A deliberately small **stabilization / developer-experience** release. No runtime
+changes, no ABI changes, no re-`init` required.
+
+* **Hot restart no longer stacks duplicate windows.** Pressing `R` re-runs your
+  `main()`; Morphic now reconciles the previous generation of surfaces, so you
+  always end with exactly one running app instead of accumulating windows.
+* **Clearer `morphic:init` output** — the apply summary ends with an *Installed
+  components* block (Package version, Runtime ABI, Tier) so there's one
+  unambiguous place to confirm what's active.
+* **Development workflow guide** (`doc/DEVELOPMENT.md`) — explains the
+  multi-engine dev loop honestly: hot restart is reconciled; hot reload updates
+  the primary isolate but not separately-spawned surface engines (with the
+  recommended iterate-then-wire workflow).
+
 ## 0.2.0-dev.15
 
 * **Fix `dart run morphic:init --spatial` building with "Cannot open include file

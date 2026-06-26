@@ -265,14 +265,24 @@ class InitCommand extends Command<int> {
             'active in this project.',
           );
         }
-        env.out.writeln('\nDone. Next:');
+        // Installed-components summary — one unambiguous place to confirm exactly
+        // what is now active (package version, the stable runtime ABI, and tier).
+        env.out.writeln('\nInstalled components');
+        env.out.writeln('  ${'─' * 36}');
+        void comp(String k, String v) =>
+            env.out.writeln('  ${k.padRight(16)}$v');
+        if (manifest.packageVersion != null) {
+          comp('Package', manifest.packageVersion!);
+        }
+        comp('Runtime ABI', '${manifest.runtimeVersion}  (stable)');
+        comp('Tier', manifest.spatial ? 'Spatial (premium)' : 'Native (free)');
+        env.out.writeln('\nReady to build:');
         env.out.writeln(
-          '  1. point your app entry at Morphic:  void main() => runMorphicApp(app: MyApp());',
+          '  point your entry at Morphic:  void main() => runMorphicApp(app: MyApp());',
         );
-        env.out.writeln('  2. flutter pub get && flutter run -d windows');
-        env.out.writeln(
-          'Undo anytime:  dart run morphic:remove --apply',
-        );
+        env.out.writeln('  flutter pub get');
+        env.out.writeln('  flutter run -d windows');
+        env.out.writeln('\nUndo anytime:  dart run morphic:remove --apply');
         if (!manifest.spatial) {
           // Natural Spatial discovery — no paywall, no pricing, just a pointer.
           env.out.writeln('\n  Native Mode: enabled.');
