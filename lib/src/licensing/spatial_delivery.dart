@@ -92,7 +92,7 @@ class SpatialDelivery {
       '{"version":"${signed.version}","sha256":"${signed.sha256}",'
       '"deliveredAt":"${DateTime.now().toUtc().toIso8601String()}"}\n',
     );
-    log('  ✓ installed to ${p.relative(dest.path, from: projectRoot)}');
+    log('  ✓ cached to ${p.relative(dest.path, from: projectRoot)}');
 
     return DeliveryResult(
       ok: true,

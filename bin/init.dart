@@ -31,7 +31,7 @@ Future<void> main(List<String> args) async {
 /// Runs the authenticated, signature-verified spatial delivery pipeline.
 /// Returns false (with a printed reason) if the user must act first.
 Future<bool> _deliverSpatial() async {
-  stdout.writeln('Delivering the Spatial runtime …');
+  stdout.writeln('Step 1 of 2 — Spatial runtime delivery\n');
   final api = MorphicApi();
   try {
     final result = await SpatialDelivery(

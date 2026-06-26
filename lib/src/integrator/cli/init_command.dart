@@ -131,20 +131,26 @@ class InitCommand extends Command<int> {
     ];
 
     if (!asJson) {
+      // In the spatial flow this runs as the second of two jobs (delivery is
+      // the first, in bin/init.dart) — label it so the two are unmistakable.
+      if (manifest.spatial) {
+        env.out.writeln('Step 2 of 2 — Project integration');
+      }
       env.out.writeln(
         'morphic init — ${apply ? 'APPLY' : 'DRY RUN'} for ${project.root}',
       );
+      env.out.writeln();
+      void kv(String k, String v) => env.out.writeln('  ${k.padRight(16)}$v');
       if (manifest.packageVersion != null) {
-        env.out.writeln('  Morphic        ${manifest.packageVersion}  (package)');
+        kv('Package', manifest.packageVersion!);
       }
-      env.out.writeln(
-        '  Runtime engine ${manifest.runtimeVersion}  (ABI, stable across releases)',
-      );
-      env.out.writeln(
-        '  Tier           ${manifest.spatial ? 'spatial (premium)' : 'native'}',
-      );
-      for (final step in plan) {
-        env.out.writeln('  • $step');
+      kv('Runtime ABI', '${manifest.runtimeVersion}  (stable across releases)');
+      kv('License', manifest.spatial ? 'Spatial (Premium)' : 'Native (Free)');
+      // Spell the spatial runtime version out HERE, in the install summary —
+      // not only during download — so there is zero doubt which runtime this
+      // project now hosts. For the spatial tier the package == the artifact.
+      if (manifest.spatial && manifest.packageVersion != null) {
+        kv('Spatial runtime', manifest.packageVersion!);
       }
       env.out.writeln();
     }
@@ -165,8 +171,12 @@ class InitCommand extends Command<int> {
           }),
         );
       } else {
+        env.out.writeln('  Project changes (planned)');
+        for (final step in plan) {
+          env.out.writeln('    • $step');
+        }
         env.out.writeln(
-          'Dry run only. Re-run with --apply to perform the transform.',
+          '\nDry run only. Re-run with --apply to perform the transform.',
         );
       }
       return MorphicExit.ok;
@@ -244,8 +254,16 @@ class InitCommand extends Command<int> {
           }),
         );
       } else {
+        env.out.writeln('  Project changes');
         for (final a in actions) {
-          env.out.writeln('  $a');
+          env.out.writeln('    ✓ $a');
+        }
+        // The explicit answer to "is Spatial actually active in THIS project?"
+        if (manifest.spatial && manifest.packageVersion != null) {
+          env.out.writeln(
+            '\n  ✓ Spatial runtime ${manifest.packageVersion} installed — '
+            'active in this project.',
+          );
         }
         env.out.writeln('\nDone. Next:');
         env.out.writeln(

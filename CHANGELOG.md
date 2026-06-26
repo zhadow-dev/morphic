@@ -1,3 +1,15 @@
+## 0.2.0-dev.14
+
+* **`morphic:init` output now removes any doubt about what was installed.** The
+  spatial flow is shown as two clearly separated steps — *Step 1: Spatial runtime
+  delivery* and *Step 2: project integration* — and the install summary explicitly
+  confirms `✓ Spatial runtime <version> installed — active in this project`, so
+  it's unmistakable the delivered runtime is the one now hosting the project. The
+  version block is aligned (`Package` / `Runtime ABI` / `License` / `Spatial
+  runtime`), `Tier` is relabelled `License`, project changes render as a `✓`
+  checklist, and the delivery step says the ZIP was "cached" (not "installed",
+  which happens in step 2).
+
 ## 0.2.0-dev.13
 
 * **Clearer `morphic:init` version output.** `init` printed only
