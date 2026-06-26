@@ -1,3 +1,13 @@
+## 0.2.0-dev.17
+
+* **Fix `flutter run` failing after install with CMake "Cannot find source file:
+  src/examples/workflow_patterns.h / No SOURCES given to target: morphic_plugin".**
+  The generated `.pubignore` excluded `examples/` **unanchored**, which (by
+  gitignore semantics) also stripped the plugin's `windows/src/examples/` sources
+  from the published package while `CMakeLists.txt` still referenced them — so the
+  plugin couldn't build. The rule is now anchored to `/examples/` (only the
+  top-level showcase dir is excluded). No API or runtime changes.
+
 ## 0.2.0-dev.16
 
 A deliberately small **stabilization / developer-experience** release. No runtime
