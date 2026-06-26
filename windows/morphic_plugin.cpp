@@ -49,9 +49,17 @@ void MorphicPlugin::RegisterWithRegistrar(
   // NOTE: This means Morphic's compositor authority depends on Flutter Runner
   // topology. This is a transitional architecture — long-term, Morphic should
   // own the root HWND hierarchy.
-  HWND childHwnd = registrar->GetView()->GetNativeWindow();
-  HWND parentHwnd = GetAncestor(childHwnd, GA_ROOT);
-  plugin->mainWindowHwnd_ = parentHwnd ? parentHwnd : childHwnd;
+  //
+  // RUNTIME CORE (H1) — a HEADLESS engine (the application bootstrap that runs
+  // main() with no window) has no view, so registrar->GetView() is null. Capture
+  // the host window ONLY when a view exists; otherwise mainWindowHwnd_ stays null
+  // and downstream uses already guard on it (e.g. hideHostWindow). This lets the
+  // plugin register on a viewless bootstrap engine without crashing.
+  if (auto *view = registrar->GetView()) {
+    HWND childHwnd = view->GetNativeWindow();
+    HWND parentHwnd = GetAncestor(childHwnd, GA_ROOT);
+    plugin->mainWindowHwnd_ = parentHwnd ? parentHwnd : childHwnd;
+  }
 
   channel->SetMethodCallHandler(
       [plugin_pointer = plugin.get()](const auto &call, auto result) {
