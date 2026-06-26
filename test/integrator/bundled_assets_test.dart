@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:morphic/src/integrator/integrator.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 /// Guards the shipped state of the package itself: every runtime asset must
@@ -31,24 +34,48 @@ void main() {
     }
   });
 
-  // PREMIUM ASSET GATE — the security boundary is DISTRIBUTION: free users never
-  // receive the spatial compositor sources. The boundary is enforced by KEEPING
-  // compositor_ng/ OUT OF THE PUBLIC TREE entirely (its real delivery is premium/
-  // roadmap — fetched only after license activation). So in this repo BOTH tiers
-  // must be compositor_ng-free; there is no public spatial-source leakage.
-  test('public tree leaks no compositor_ng sources, in any tier', () async {
+  // PREMIUM ASSET GATE — the security boundary is DISTRIBUTION. The NATIVE
+  // manifest (what ships in the free package) must be compositor_ng-free. The
+  // SPATIAL manifest is a strict SUPERSET that INCLUDES compositor_ng — it is
+  // delivered only in the license-gated ZIP, never in the published package, so
+  // it is intentionally ABSENT from the premium-stripped public tree.
+  test('native tier is compositor_ng-free; spatial tier is a superset that '
+      'includes it', () async {
     final assetsRoot = await findRuntimeAssetsRoot();
-    for (final spatial in [false, true]) {
-      final m = RuntimeManifest.loadBundled(assetsRoot, spatial: spatial);
-      expect(
-        m.files.where((e) => e.target.contains('/compositor_ng/')),
-        isEmpty,
-        reason: 'no public spatial-source leakage (compositor_ng is premium)',
-      );
-      expect(m.verifyAssets(assetsRoot), isEmpty);
-    }
+
+    // NATIVE: always present; never carries premium spatial sources.
     final native = RuntimeManifest.loadBundled(assetsRoot, spatial: false);
     expect(native.spatial, isFalse);
+    expect(
+      native.files.where((e) => e.target.contains('/compositor_ng/')),
+      isEmpty,
+      reason: 'the free/native package must never carry premium spatial sources',
+    );
+    expect(native.verifyAssets(assetsRoot), isEmpty);
+
+    // SPATIAL: present in the private repo + the delivered ZIP, but ABSENT from
+    // the premium-stripped public tree. When present it must include
+    // compositor_ng, hash-match the tree, and be a strict superset of native.
+    if (!File(p.join(assetsRoot, 'manifest_spatial.json')).existsSync()) {
+      return; // public tier — nothing further to assert
+    }
+    final spatial = RuntimeManifest.loadBundled(assetsRoot, spatial: true);
+    expect(spatial.spatial, isTrue);
+    expect(
+      spatial.files.where((e) => e.target.contains('/compositor_ng/')),
+      isNotEmpty,
+      reason: 'the spatial tier must include the compositor_ng sources it needs',
+    );
+    expect(spatial.verifyAssets(assetsRoot), isEmpty);
+
+    final nativeTargets = native.files.map((e) => e.target).toSet();
+    final spatialTargets = spatial.files.map((e) => e.target).toSet();
+    expect(
+      nativeTargets.difference(spatialTargets),
+      isEmpty,
+      reason: 'spatial must be a strict superset of native',
+    );
+    expect(spatialTargets.length, greaterThan(nativeTargets.length));
   });
 
   // The entrypoint and CMakeLists are special-cased (template + patcher); a

@@ -1,3 +1,19 @@
+## 0.2.0-dev.15
+
+* **Fix `dart run morphic:init --spatial` building with "Cannot open include file
+  'compositor_ng/projection_reconciler.h'".** The spatial compositor sources
+  (`compositor_ng/`, 19 files) were never vendored into `runtime_assets/`, so they
+  were missing from `manifest_spatial.json` and from the delivered runtime ZIP —
+  yet the spatial CMake defines `MORPHIC_SPATIAL`, which `#include`s them. They are
+  now part of the spatial tier, which is a true superset of native.
+* **Spatial install now materializes from the delivered artifact.** `init
+  --spatial` previously read from the bundled (premium-stripped) package, which by
+  design can never contain `compositor_ng/`. It now extracts the license-gated ZIP
+  and materializes the runtime from it. The free package stays compositor_ng-free;
+  `manifest_spatial.json` is delivered in the ZIP and no longer shipped to pub.dev.
+* The release-integrity gate stays strict on the private tree and the ZIP (both
+  manifests, full superset) and is tier-aware for the public package.
+
 ## 0.2.0-dev.14
 
 * **`morphic:init` output now removes any doubt about what was installed.** The

@@ -14,11 +14,22 @@ import 'package:morphic/src/licensing/spatial_delivery.dart';
 /// (login → authorize → signed URL → download → verify) before init proceeds.
 Future<void> main(List<String> args) async {
   try {
+    // For the spatial tier, deliver + unpack the license-gated runtime first,
+    // then point init at the EXTRACTED artifact (its compositor_ng/ sources are
+    // never in the published package). Native init uses the bundled assets.
+    String? spatialAssetsRoot;
     if (args.contains('--spatial')) {
-      final ok = await _deliverSpatial();
-      if (!ok) exit(MorphicExit.refused);
+      spatialAssetsRoot = await _deliverSpatial();
+      if (spatialAssetsRoot == null) exit(MorphicExit.refused);
     }
-    exit(await buildMorphicRunner().run(['init', ...args]) ?? MorphicExit.ok);
+    final env =
+        spatialAssetsRoot != null
+            ? CliEnvironment(assetsRoot: spatialAssetsRoot)
+            : CliEnvironment();
+    exit(
+      await buildMorphicRunner(environment: env).run(['init', ...args]) ??
+          MorphicExit.ok,
+    );
   } on UsageException catch (e) {
     stderr.writeln(e);
     exit(MorphicExit.usage);
@@ -29,8 +40,9 @@ Future<void> main(List<String> args) async {
 }
 
 /// Runs the authenticated, signature-verified spatial delivery pipeline.
-/// Returns false (with a printed reason) if the user must act first.
-Future<bool> _deliverSpatial() async {
+/// Returns the extracted `runtime_assets/` root to materialize from, or null
+/// (with a printed reason) if the user must act first / delivery failed.
+Future<String?> _deliverSpatial() async {
   stdout.writeln('Step 1 of 2 — Spatial runtime delivery\n');
   final api = MorphicApi();
   try {
@@ -42,13 +54,13 @@ Future<bool> _deliverSpatial() async {
 
     if (!result.ok) {
       stderr.writeln('\n${result.message}');
-      return false;
+      return null;
     }
     stdout.writeln('\n✓ ${result.message}\n');
-    return true;
+    return result.assetsRoot;
   } on MorphicApiException catch (e) {
     stderr.writeln('\nSpatial delivery failed: $e');
-    return false;
+    return null;
   } finally {
     api.close();
   }

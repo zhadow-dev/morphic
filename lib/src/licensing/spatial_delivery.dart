@@ -5,6 +5,7 @@
 // a flag on the backend — this pipeline does not change.
 import 'dart:io';
 
+import 'package:archive/archive_io.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 
@@ -13,11 +14,22 @@ import 'auth_store.dart';
 
 /// Outcome of a delivery attempt.
 class DeliveryResult {
-  DeliveryResult({required this.ok, required this.message, this.version, this.installedTo});
+  DeliveryResult({
+    required this.ok,
+    required this.message,
+    this.version,
+    this.installedTo,
+    this.assetsRoot,
+  });
   final bool ok;
   final String message;
   final String? version;
   final String? installedTo;
+
+  /// The extracted `runtime_assets/` root of the delivered artifact — what
+  /// `init --spatial` materializes from. The spatial sources (`compositor_ng/`)
+  /// live ONLY here, never in the published package.
+  final String? assetsRoot;
 }
 
 /// A line-oriented progress sink so the CLI controls presentation.
@@ -82,23 +94,49 @@ class SpatialDelivery {
     }
     log('  ✓ sha256 verified');
 
-    // 6. Install into the project cache.
+    // 6. Cache the verified artifact in the project.
     final cacheDir = Directory(p.join(projectRoot, '.morphic', 'spatial'));
     cacheDir.createSync(recursive: true);
     final dest = File(p.join(cacheDir.path, 'runtime-v${signed.version}.zip'));
     dest.writeAsBytesSync(bytes);
+    log('  ✓ cached to ${p.relative(dest.path, from: projectRoot)}');
+
+    // 7. Extract it so `init` can materialize the spatial runtime FROM the
+    //    artifact. This is the source of truth for the spatial tier: the
+    //    compositor_ng/ sources ship only here (the published package is
+    //    premium-stripped), so init must read from the extracted tree, not the
+    //    bundled package assets.
+    final extractDir = Directory(
+      p.join(cacheDir.path, 'runtime-v${signed.version}'),
+    );
+    if (extractDir.existsSync()) extractDir.deleteSync(recursive: true);
+    extractDir.createSync(recursive: true);
+    await extractFileToDisk(dest.path, extractDir.path);
+    // The artifact is a zip OF `runtime_assets/`, so the manifests + sources
+    // land under that subdirectory.
+    final assetsRoot = p.join(extractDir.path, 'runtime_assets');
+    if (!File(p.join(assetsRoot, 'manifest_spatial.json')).existsSync()) {
+      return DeliveryResult(
+        ok: false,
+        message:
+            'Delivered artifact is missing runtime_assets/manifest_spatial.json '
+            '— unexpected archive layout. Try again, or report this build.',
+      );
+    }
+    log('  ✓ unpacked spatial runtime');
+
     // Record what was delivered (audit trail / idempotency).
     File(p.join(cacheDir.path, 'delivered.json')).writeAsStringSync(
       '{"version":"${signed.version}","sha256":"${signed.sha256}",'
       '"deliveredAt":"${DateTime.now().toUtc().toIso8601String()}"}\n',
     );
-    log('  ✓ cached to ${p.relative(dest.path, from: projectRoot)}');
 
     return DeliveryResult(
       ok: true,
       message: 'Spatial runtime v${signed.version} delivered.',
       version: signed.version,
       installedTo: dest.path,
+      assetsRoot: assetsRoot,
     );
   }
 }

@@ -1,6 +1,6 @@
 name: morphic
 description: "A Flutter desktop runtime for building real multi-window applications in pure Dart: native OS windows, window orchestration, and cross-window messaging."
-version: 0.2.0-dev.14
+version: 0.2.0-dev.15
 homepage: https://www.getmorphic.space
 repository: https://github.com/zhadow-dev/morphic
 issue_tracker: https://github.com/zhadow-dev/morphic/issues
@@ -25,6 +25,10 @@ dependencies:
   path: ^1.9.0
   # CLI auth + secure spatial delivery (`morphic:login` / `init --spatial`).
   http: ^1.2.0
+  # Extract the delivered spatial runtime ZIP (premium tier) into the project's
+  # local cache before materialization — the compositor_ng sources are never in
+  # the published package, only in the license-gated artifact.
+  archive: ^4.0.0
 
 dev_dependencies:
   flutter_test:
