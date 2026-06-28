@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:morphic/src/integrator/integrator.dart';
 import 'package:path/path.dart' as p;
 
-const String kRuntimeVersion = '0.1.0';
+const String kRuntimeVersion = '0.2.0';
 
 /// The pub.dev package version, read from the package's own pubspec — the
 /// single source of truth. Distinct from [kRuntimeVersion] (the engine ABI).

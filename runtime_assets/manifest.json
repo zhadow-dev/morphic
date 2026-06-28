@@ -1,12 +1,12 @@
 {
-  "runtimeVersion": "0.1.0",
-  "packageVersion": "0.2.0-dev.17",
+  "runtimeVersion": "0.2.0",
+  "packageVersion": "0.3.0-beta.1",
   "spatial": false,
   "fileCount": 127,
   "mainReplacement": {
     "source": "windows/runner_main_morphic.cpp",
     "target": "windows/runner/main.cpp",
-    "sha256": "fa6a2da9dfd651aa03c270c26bcf824b94c2fe1cac456b22131541a7b5f6c4f6",
+    "sha256": "086a5487e216eb9a793f93b92942d776effd6aef3b3fca949f372e9643b13379",
     "kind": "main_replacement"
   },
   "files": [
@@ -127,13 +127,13 @@
     {
       "source": "windows/runner_morphic/morphic_runtime.cpp",
       "target": "windows/runner/morphic_runtime.cpp",
-      "sha256": "60726f021b2c7a4f670eeec504497380f25165e4bb9d7d96d66c86772e5ec1b8",
+      "sha256": "2acca8188b03e50a86f5058f158ad6d93c4b9a5f99107708ee83d1180569e95f",
       "kind": "runtime_source"
     },
     {
       "source": "windows/runner_morphic/morphic_runtime.h",
       "target": "windows/runner/morphic_runtime.h",
-      "sha256": "d9e257d3268dab47d14a86d08d374c6fd971bdf3a0e7aacae1800382bd13fdf4",
+      "sha256": "9f4476f2ec362cd9835d4e83f869f57ea4114112470e4f5640ce42b6b89e6edb",
       "kind": "runtime_source"
     },
     {
@@ -767,5 +767,5 @@
       "kind": "runtime_source"
     }
   ],
-  "generated": "2026-06-26T12:19:06.037988Z"
+  "generated": "2026-06-28T05:54:08.533091Z"
 }

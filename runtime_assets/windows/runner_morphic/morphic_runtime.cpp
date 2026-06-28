@@ -2,6 +2,8 @@
 
 #include <windows.h>
 
+#include <flutter/generated_plugin_registrant.h>  // RUNTIME CORE (H0a) — RegisterPlugins
+
 #include <string>
 
 #include "churn_harness.h"
@@ -67,6 +69,7 @@ MorphicRuntime::~MorphicRuntime() {
 bool MorphicRuntime::Create() {
   forensic::Log("RUNTIME",
                 "Create: event bus + surface model + frame clock + interaction router + surface manager");
+
   bus_ = std::make_unique<EventBus>();
   model_ = std::make_unique<SurfaceModel>();
   model_->SetEventBus(bus_.get());
@@ -791,24 +794,28 @@ bool MorphicRuntime::Create() {
     if (gravity_) gravity_->OnWindowState(s);
   });
 
-  // PHASE 10.2/10.3 — spawn the LAUNCHER as a GLOBAL meta-control surface
-  // (SurfaceKind::EcologyLauncher). It belongs to NO workspace, is never grouped /
-  // detached / workspace-activated, and is hidden from Alt+Tab/taskbar
-  // (WS_EX_TOOLWINDOW). This fixes the 10.2 mismatch where the launcher behaved
-  // workspace-owned (dragging a workspace dragged the launcher). It runs the
-  // 'main' entrypoint; all other surfaces spawn on-demand through the ecology.
-  using morphic::policy::SurfaceKind;
-  // M2.3E — the root/launcher is a SMALL corner presence chip (was a 420x640 slab that read as a
-  // broken/forgotten window). Tiny window = ambient app-presence, not a panel. (Truly invisible =
-  // the deferred HiddenRootEngine host-lifetime work.)
-  if (!ecology_->SpawnSurface(project_, SurfaceKind::EcologyLauncher, "launcher",
-                              "main", 24, 24, 200, 52)) {
+  // RUNTIME CORE (H0b) — THE INVARIANT: the Runtime never displays UI. Run the
+  // app's main() on a HEADLESS bootstrap engine (no view, not a SurfaceManager
+  // surface, not counted in lifetime). There is NO launcher window. main() ==
+  // MorphicRuntime.run(app:) orchestrates the app's surfaces over the 'morphic'
+  // channel; every visible window is an application Surface.
+  //
+  // Created HERE — after the extension handler + ecology are wired above — so
+  // main()'s spawn calls reach the runtime. The engine's tasks are pumped by the
+  // runner loop via bootstrap_engine()->ProcessMessages(); main() resumes once
+  // wWinMain enters the message loop after Create() returns.
+  bootstrap_engine_ = std::make_unique<flutter::FlutterEngine>(project_);
+  RegisterPlugins(bootstrap_engine_.get());  // view-null-safe since H1
+  if (!bootstrap_engine_->Run("main")) {
+    forensic::Log("RUNTIME-CORE",
+                  "headless bootstrap FAILED to Run(\"main\") — Runtime Core not "
+                  "viable; STOP (do not fall back to a launcher)");
     return false;
   }
+  forensic::Log("RUNTIME-CORE",
+                "headless bootstrap running main() — no launcher, no view");
 
-  model_->ReconcileZOrder();  // project initial semantic z onto native HWND order
-  forensic::Log("RUNTIME", "Create: launcher surface up; initial z-order reconciled");
-  ecology_->LogSummary();     // PHASE 10.1 — prove descriptors/workspaces wired
+  ecology_->LogSummary();  // PHASE 10.1 — prove descriptors/workspaces wired
 
   // PHASE 8B.7 — auto-start soak if configured. `if constexpr` on the compile-time
   // duration so MSVC /WX doesn't flag the constant condition (C4127) when soak is

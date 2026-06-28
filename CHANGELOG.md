@@ -1,3 +1,30 @@
+## 0.3.0-beta.1
+
+**Runtime Core (ABI 0.2) — the runtime is now headless.** The biggest change
+since the pivot: there is no launcher window. Your app's `main()` runs on a
+headless engine and **every visible window is one of your Surfaces**. The process
+exits when the last Surface closes. Engine ABI moves **0.1.0 → 0.2.0**.
+
+**Upgrading from a `0.2.0-dev.x` project?** Re-materialize the runtime once:
+
+```bash
+flutter pub upgrade            # or set morphic: ^0.3.0-beta.1
+dart run morphic:init --force  # installs the ABI 0.2 runtime
+```
+
+See [`doc/MIGRATION.md`](doc/MIGRATION.md). Your app code (surfaces, entrypoints,
+AppBus) does not change.
+
+- **New `MorphicRuntime.run(app: ...)` entrypoint.** `runMorphicApp(app: ...)`
+  still works as a thin deprecated shim — no app changes required.
+- **Launcher removed.** The runtime no longer owns a visible window; the only
+  windows on screen are your application Surfaces. `MorphicApp.dissolveRootIntoScene`
+  is gone (it only dissolved the old launcher root) — delete any override.
+- **`morphic:init` is version-aware.** On an older install it now reports that an
+  upgrade is available and points to `--force`, instead of silently doing nothing.
+- **Runtime Core is frozen at ABI 0.2** — see
+  [`doc/internals/runtime/RUNTIME_CORE_INVARIANTS.md`](doc/internals/runtime/RUNTIME_CORE_INVARIANTS.md).
+
 ## 0.2.0-dev.17
 
 * **Fix `flutter run` failing after install with CMake "Cannot find source file:

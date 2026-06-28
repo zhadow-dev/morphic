@@ -17,17 +17,4 @@ abstract class MorphicApp {
   /// The surfaces this app brings up at boot, in spawn order. A spec's `parent` references another
   /// spec's app-local `id`; the boot resolves it to the real native id.
   List<SurfaceSpec> surfaces();
-
-  /// M2.8 — whether the visible app-ROOT (the boot-shell presence chip) should DISSOLVE once it has
-  /// bootstrapped the scene. Default `false`: the app keeps a small ambient presence chip (the home
-  /// affordance — e.g. Notes). Override `true` for SPATIAL-NATIVE scenes (the Habitat) where the SCENE
-  /// ITSELF is the app-presence: a launcher/root chip would be a SECOND anchor that competes with the
-  /// real anchor and reads as "this is an application", collapsing environment→software. When true, the
-  /// boot shell closes its own root surface after spawning — which is lifetime-safe because the scene's
-  /// surfaces keep the count > 0, and closing them all later still quits cleanly (no zombie root). This
-  /// is the showcase-scoped version of the deferred "separate runtime-root from visible presence".
-  ///
-  /// NOTE: the launcher coupling this works around is slated for removal in the
-  /// Runtime Core redesign (see doc/internals/runtime/). Do not build on it.
-  bool get dissolveRootIntoScene => false;
 }

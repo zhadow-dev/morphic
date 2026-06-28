@@ -98,6 +98,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     while (::GetMessage(&msg, nullptr, 0, 0)) {
       ::TranslateMessage(&msg);
       ::DispatchMessage(&msg);
+      // RUNTIME CORE (H0a) — pump the headless bootstrap engine's platform-thread
+      // tasks after each message. The engine self-posts wake messages, so
+      // GetMessage returns and we drain its task queue here. Inert (no engine)
+      // until Create() starts the probe.
+      if (auto *be = runtime.bootstrap_engine()) be->ProcessMessages();
     }
     forensic::Log("BOOT", "GetMessage loop exited; CoUninitialize");
   }

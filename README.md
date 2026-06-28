@@ -97,8 +97,11 @@ class MyApp extends MorphicApp {
       ];
 }
 
-void main() => runMorphicApp(app: MyApp());
+void main() => MorphicRuntime.run(app: MyApp());
 ```
+
+> Upgrading from an earlier release? `runMorphicApp(app: ...)` still works — it
+> is now a thin shim for `MorphicRuntime.run(app: ...)`.
 
 ## Multiple windows
 

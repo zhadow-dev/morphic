@@ -2,6 +2,7 @@
 #define RUNNER_MORPHIC_RUNTIME_H_
 
 #include <flutter/dart_project.h>
+#include <flutter/flutter_engine.h>
 
 #include <memory>
 
@@ -54,8 +55,19 @@ class MorphicRuntime {
   // and is torn down (stack scope in wWinMain) before MorphicRuntime::Destroy.
   FrameClock* clock() const { return clock_.get(); }
 
+  // RUNTIME CORE (H0a) — the headless bootstrap engine: runs Dart with NO view
+  // (the candidate for hosting main() instead of the launcher surface). The
+  // runner pumps it via ProcessMessages(). Null until Create() starts it.
+  flutter::FlutterEngine* bootstrap_engine() const {
+    return bootstrap_engine_.get();
+  }
+
  private:
   flutter::DartProject project_;
+  // RUNTIME CORE (H0a) — declared right after project_ so it outlives the runtime
+  // members (destructs last). Today a probe alongside the launcher; the future
+  // host of main(). See bootstrap_engine().
+  std::unique_ptr<flutter::FlutterEngine> bootstrap_engine_;
   // Declaration order matters for teardown: members destruct in reverse.
   // Reverse order: manager_ first (references router/model/bus), then router_
   // (subscribes to clock_ and references model_/bus_), then clock_ (must

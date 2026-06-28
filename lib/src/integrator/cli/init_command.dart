@@ -99,21 +99,70 @@ class InitCommand extends Command<int> {
 
     final alreadyInstalled = engine.isInstalled;
     if (alreadyInstalled && !force) {
+      // Version-aware idempotency: compare the INSTALLED runtime ABI (from the
+      // project's install record) against the PACKAGED runtime ABI (this
+      // package's bundled manifest). Equal → nothing to do. Different → tell the
+      // user; never silently leave them on an older runtime.
       final rec = engine.readRecord()!;
-      final msg =
-          'Morphic already installed (runtime ${rec.runtimeVersion}). '
-          'Nothing to do. Use --force to re-install, or `morphic remove` first.';
+      final installedAbi = rec.runtimeVersion;
+      final packagedAbi = manifest.runtimeVersion;
+      final cmp = _compareRuntimeAbi(installedAbi, packagedAbi);
+      final upgradeAvailable = cmp < 0;
+
       if (asJson) {
         env.out.writeln(
           jsonEncode({
             'command': 'init',
             'ok': true,
             'alreadyInstalled': true,
-            'installedRuntimeVersion': rec.runtimeVersion,
+            'installedRuntimeVersion': installedAbi,
+            'packagedRuntimeVersion': packagedAbi,
+            'upgradeAvailable': upgradeAvailable,
           }),
         );
+        return MorphicExit.ok;
+      }
+
+      if (cmp == 0) {
+        // Case 1 — installed runtime matches the packaged runtime.
+        env.out.writeln('Runtime already installed.');
+        env.out.writeln();
+        env.out.writeln('  ABI $packagedAbi');
+        env.out.writeln();
+        env.out.writeln('Nothing to do.');
+      } else if (cmp < 0) {
+        // Case 2 — installed runtime is OLDER than the packaged runtime.
+        env.out.writeln('Installed runtime:');
+        env.out.writeln();
+        env.out.writeln('  ABI $installedAbi');
+        env.out.writeln();
+        env.out.writeln('Available runtime:');
+        env.out.writeln();
+        env.out.writeln('  ABI $packagedAbi');
+        env.out.writeln();
+        env.out.writeln('A runtime upgrade is available.');
+        env.out.writeln();
+        env.out.writeln('Re-run with:');
+        env.out.writeln();
+        env.out.writeln('  dart run morphic:init --force');
       } else {
-        env.out.writeln(msg);
+        // Edge — installed runtime is NEWER than the packaged runtime (e.g. the
+        // morphic package was downgraded). Still never continue silently.
+        env.out.writeln('Installed runtime:');
+        env.out.writeln();
+        env.out.writeln('  ABI $installedAbi');
+        env.out.writeln();
+        env.out.writeln('Packaged runtime:');
+        env.out.writeln();
+        env.out.writeln('  ABI $packagedAbi');
+        env.out.writeln();
+        env.out.writeln(
+          "The installed runtime is newer than this package's runtime.",
+        );
+        env.out.writeln();
+        env.out.writeln('To replace it with the packaged runtime, re-run with:');
+        env.out.writeln();
+        env.out.writeln('  dart run morphic:init --force');
       }
       return MorphicExit.ok;
     }
@@ -330,6 +379,25 @@ class InitCommand extends Command<int> {
       env.err.writeln(message);
     }
     return MorphicExit.precondition;
+  }
+
+  /// Compares two runtime ABI strings (e.g. "0.1.0" vs "0.2.0"). Returns a
+  /// negative number if [a] is older than [b], 0 if equal, positive if newer.
+  /// Numeric and dot-segmented; falls back to a lexical compare if any segment
+  /// is non-numeric (runtime ABIs are always plain X.Y.Z, so the fallback is
+  /// purely defensive).
+  static int _compareRuntimeAbi(String a, String b) {
+    if (a == b) return 0;
+    final pa = a.split('.');
+    final pb = b.split('.');
+    final n = pa.length > pb.length ? pa.length : pb.length;
+    for (var i = 0; i < n; i++) {
+      final ia = i < pa.length ? int.tryParse(pa[i]) : 0;
+      final ib = i < pb.length ? int.tryParse(pb[i]) : 0;
+      if (ia == null || ib == null) return a.compareTo(b);
+      if (ia != ib) return ia - ib;
+    }
+    return 0;
   }
 
   /// How the generated pubspec references the morphic package. If

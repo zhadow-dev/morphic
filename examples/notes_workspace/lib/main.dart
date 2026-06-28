@@ -93,4 +93,4 @@ class NotesApp extends MorphicApp {
   ];
 }
 
-void main() => runMorphicApp(app: NotesApp());
+void main() => MorphicRuntime.run(app: NotesApp());

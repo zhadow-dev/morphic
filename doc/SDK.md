@@ -32,11 +32,13 @@ class MyApp extends MorphicApp {
   List<SurfaceSpec> surfaces() => const [
         SurfaceSpec.workspace(id: 'main', entrypoint: 'mainSurface'),
       ];
-
-  // Optional: dissolve the boot root after spawning (for scene-style apps).
-  @override
-  bool get dissolveRootIntoScene => false;
 }
+```
+
+Boot it from `main()`:
+
+```dart
+void main() => MorphicRuntime.run(app: MyApp());
 ```
 
 ## `SurfaceSpec`

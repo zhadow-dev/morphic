@@ -1,39 +1,31 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'ecology_controller.dart';
 import 'morphic_app.dart';
-import 'morphic_surface.dart';
 import 'surface_spec.dart';
 
-/// MORPHIC AUTHORING LAYER (M2.2B) — boot + spawn.
+/// MORPHIC RUNTIME CORE (ABI 0.2) — application bootstrap.
 ///
-/// `runMorphicApp(app: NotesApp())` is the honest replacement for hand-written launcher hacks +
-/// raw spawn buttons + manual parent plumbing. The boot engine renders a minimal app shell and
-/// orchestrates spawning the app's surfaces — it does NOT render them inline (they are separate
-/// engines). This keeps the multi-engine truth visible while the *authoring* feels Flutter-native.
+/// THE INVARIANT: the Runtime never displays UI. `main()` runs on a windowless
+/// bootstrap engine that the native runtime owns; it orchestrates the app's
+/// surfaces and renders nothing. There is no launcher window and no widget tree
+/// here — every visible window is an application Surface.
 
 final EcologyController _ecology = EcologyController();
 
 /// DX — SESSION RECONCILIATION (P1). A Flutter **hot restart** re-runs `main()`
-/// in the root isolate, but the native runtime and the surfaces it has already
-/// spawned are C++-owned and survive the restart — so a naive re-spawn stacks
-/// duplicate windows (1 → 2 → 3 …).
+/// on the bootstrap engine, but the native runtime and the surfaces it has
+/// already spawned are C++-owned and survive the restart — so a naive re-spawn
+/// stacks duplicate windows (1 → 2 → 3 …).
 ///
 /// The fix is generation-aware boot: snapshot the surfaces that exist *before*
 /// this boot spawns (orphans from the previous generation), spawn this boot's
 /// surfaces, then reap ONLY those orphans. Reaping AFTER spawning keeps the live
-/// surface count > 0 throughout, so it can never trip the runtime's "last surface
-/// closed → exit". Cold start: the snapshot is empty, so this is a no-op (and in
-/// production `main()` runs once, so there are never orphans).
-///
-/// Set to `false` for instant rollback to the legacy (duplicating) boot.
+/// surface count > 0 throughout, so it never trips the runtime's "last surface
+/// closed → exit". Cold start: the snapshot is empty (and in production `main()`
+/// runs once, so there are never orphans). Note: the bootstrap engine is NOT a
+/// tracked surface, so it can never appear in the orphan set.
 const bool kSessionReconcile = true;
-
-/// The fixed native id of the bootstrap launcher surface (it runs the app's
-/// `main()`). It persists across a hot restart, so the P1 reconciler must NEVER
-/// reap it — doing so would destroy the very engine running this code. Matches
-/// the id the native runtime spawns the launcher with.
-const String _kLauncherSurfaceId = 'launcher';
 
 /// Spawn an app's [SurfaceSpec]s, resolving in-spec `parent` references (app-local ids) to the
 /// real native ids. Returns the spec-id → native-id map. Pure orchestration over the raw channel;
@@ -67,143 +59,41 @@ Future<Map<String, String>> spawnApp(MorphicApp app) async {
   return idMap;
 }
 
-/// Boot a Morphic app: this becomes the app's `main()`.
+/// The Morphic application runtime. The runtime — never a window — owns the
+/// application's lifetime; this is the developer's entry point.
 ///
-///     void main() => runMorphicApp(app: NotesApp());
-void runMorphicApp({required MorphicApp app}) {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(_MorphicBootShell(app: app));
-}
+///     void main() => MorphicRuntime.run(app: MyApp());
+abstract final class MorphicRuntime {
+  /// Boot a Morphic application. Initializes the binding for platform channels
+  /// (no `runApp`: the bootstrap engine is headless and renders nothing), then
+  /// reconciles + spawns the app's surfaces.
+  static Future<void> run({required MorphicApp app}) async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-class _MorphicBootShell extends StatefulWidget {
-  final MorphicApp app;
-  const _MorphicBootShell({required this.app});
-
-  @override
-  State<_MorphicBootShell> createState() => _MorphicBootShellState();
-}
-
-class _MorphicBootShellState extends State<_MorphicBootShell> {
-  int _spawnCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // A dissolving root hides itself natively BEFORE spawning the scene, so
-      // the boot chip never lingers on screen while the surfaces come up.
-      if (widget.app.dissolveRootIntoScene) {
-        await MorphicSurface.hide();
+    // P1 — snapshot orphans from a previous boot generation BEFORE spawning.
+    // Best-effort: reconciliation must never block boot.
+    List<String> orphans = const [];
+    if (kSessionReconcile) {
+      try {
+        orphans = await _ecology.currentSurfaceIds();
+      } catch (_) {
+        orphans = const [];
       }
-      // P1 — snapshot orphan surfaces from a previous boot generation BEFORE we
-      // spawn this boot's surfaces. Best-effort: reconciliation must never block
-      // boot, so any channel error just falls back to the legacy behavior.
-      List<String> orphans = const [];
-      if (kSessionReconcile) {
-        try {
-          orphans = await _ecology.currentSurfaceIds();
-        } catch (_) {
-          orphans = const [];
-        }
-      }
-      await spawnApp(widget.app);
-      // Reap ONLY the orphans, and only AFTER this boot's surfaces exist — so the
-      // live count stays > 0 and the runtime never sees "all surfaces closed".
-      // NEVER reap the bootstrap launcher: it is the surface running THIS main().
-      for (final id in orphans) {
-        if (id == _kLauncherSurfaceId) continue;
-        try {
-          await _ecology.destroySurface(id);
-        } catch (_) {
-          // best-effort; a failed reap just leaves one stale window, never a crash
-        }
-      }
-      // M2.8 — a spatial-native scene IS its own app-presence; the boot root has no spatial meaning,
-      // so it DISSOLVES once it has bootstrapped the surfaces. Closing (not hiding) keeps lifetime
-      // honest: the scene's surfaces hold the count > 0 now, and closing them all later quits cleanly.
-      if (widget.app.dissolveRootIntoScene) {
-        await MorphicSurface.close();
-      }
-    });
-  }
-
-  // M2.3F — the chip's reason to exist: spawn the app's PRIMARY surface (its first spec) on tap.
-  // App-agnostic — it knows the spec, not what a "note" is. This is the earned empty-state/home
-  // affordance (when every document is closed, the chip is how you make a new one). NOT a launcher.
-  void _spawnPrimary() {
-    final specs = widget.app.surfaces();
-    if (specs.isEmpty) return;
-    final s = specs.first;
-    final off = 28 * (_spawnCount++ % 8); // cascade so repeats don't stack
-    _ecology.spawnSurface(
-      kind: s.kind,
-      entrypoint: s.entrypoint,
-      x: s.x + off,
-      y: s.y + off,
-      width: s.width,
-      height: s.height,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // M2.8 — spatial-native scene: render NOTHING (transparent + empty) while the root dissolves, so
-    // no chip ever competes with the real anchor. The scene's own surfaces are the entire experience.
-    if (widget.app.dissolveRootIntoScene) {
-      return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-            backgroundColor: Colors.transparent, body: SizedBox.shrink()),
-      );
     }
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0D1117),
-      ),
-      home: Scaffold(
-        backgroundColor: const Color(0xFF11151B),
-        // M2.3E — app-presence as a small, INTENTIONAL chip, not a slab. The root engine is
-        // structurally persistent (can't be a document, can't be closed) and has no operational
-        // identity — so it reads as a compact, soft "app is here" pill (small window = ambient
-        // presence, not a broken/forgotten panel). Truly hiding it needs the host-lifetime redesign
-        // (HiddenRootEngine), still deferred; this is the visual/behavioral fix. App-agnostic: it
-        // knows only the app's name, never what a surface IS.
-        body: Center(
-          child: Tooltip(
-            message: 'New ${widget.app.name} surface',
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: _spawnPrimary,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 9,
-                      height: 9,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                            colors: [Color(0xFF58A6FF), Color(0xFFD2A8FF)]),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(widget.app.name,
-                        style: const TextStyle(
-                            color: Color(0xFFAEB6C0),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3)),
-                    const SizedBox(width: 10),
-                    const Icon(Icons.add, size: 14, color: Color(0xFF49525C)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    await spawnApp(app);
+    // Reap ONLY the orphans, AFTER this boot's surfaces exist — so the live
+    // count stays > 0 and the runtime never sees "all surfaces closed".
+    for (final id in orphans) {
+      try {
+        await _ecology.destroySurface(id);
+      } catch (_) {
+        // best-effort; a failed reap leaves one stale window, never a crash
+      }
+    }
   }
 }
+
+/// DEPRECATED — use [MorphicRuntime.run]. The runtime now owns the application;
+/// this is a forwarding shim removed after ABI 0.2.
+@Deprecated('Use MorphicRuntime.run(app: ...) instead.')
+void runMorphicApp({required MorphicApp app}) => MorphicRuntime.run(app: app);

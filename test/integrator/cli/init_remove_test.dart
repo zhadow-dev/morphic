@@ -82,6 +82,55 @@ void main() {
     expect(snapshotProject(), after);
   });
 
+  // Rewrites the install record's runtime ABI to [abi] — simulating a project
+  // installed with an older runtime, so a re-init must detect the mismatch.
+  void setInstalledRuntimeAbi(String abi) {
+    final recFile = File(p.join(projectRoot, '.morphic', 'install.json'));
+    final rec = jsonDecode(recFile.readAsStringSync()) as Map<String, dynamic>;
+    rec['runtimeVersion'] = abi;
+    recFile.writeAsStringSync(jsonEncode(rec));
+  }
+
+  test('re-init on a MATCHING runtime says nothing to do (version-aware)',
+      () async {
+    await cli.run(['init', '--apply']);
+    cli.out.clear();
+    final code = await cli.run(['init']);
+    expect(code, MorphicExit.ok);
+    final out = cli.out.toString();
+    expect(out, contains('Runtime already installed'));
+    expect(out, contains('9.9.9-test')); // the packaged ABI
+    expect(out, contains('Nothing to do'));
+    expect(out, isNot(contains('upgrade is available')));
+  });
+
+  test('re-init on an OLDER runtime reports an upgrade is available', () async {
+    await cli.run(['init', '--apply']);
+    setInstalledRuntimeAbi('0.1.0'); // older than the packaged 9.9.9-test
+    cli.out.clear();
+    final code = await cli.run(['init']);
+    expect(code, MorphicExit.ok);
+    final out = cli.out.toString();
+    expect(out, contains('A runtime upgrade is available'));
+    expect(out, contains('0.1.0')); // installed
+    expect(out, contains('9.9.9-test')); // available
+    expect(out, contains('--force'));
+    expect(out, isNot(contains('Nothing to do')));
+  });
+
+  test('re-init --json flags upgradeAvailable on an ABI mismatch', () async {
+    await cli.run(['init', '--apply']);
+    setInstalledRuntimeAbi('0.1.0');
+    cli.out.clear();
+    final code = await cli.run(['init', '--json']);
+    expect(code, MorphicExit.ok);
+    final payload = jsonDecode(cli.out.toString()) as Map<String, dynamic>;
+    expect(payload['alreadyInstalled'], isTrue);
+    expect(payload['installedRuntimeVersion'], '0.1.0');
+    expect(payload['packagedRuntimeVersion'], '9.9.9-test');
+    expect(payload['upgradeAvailable'], isTrue);
+  });
+
   test('init honors MORPHIC_LOCAL_REPO with a path dependency', () async {
     final repo = Directory(p.join(sandbox.path, 'morphic_repo'))
       ..createSync(recursive: true);
